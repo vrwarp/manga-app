@@ -1,0 +1,19 @@
+{
+  "name": "manga-app",
+  "version": "0.0.0",
+  "authors": [
+    "Benson Tsai <btsai@vrwarp.com>"
+  ],
+  "moduleType": [
+    "es6"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
