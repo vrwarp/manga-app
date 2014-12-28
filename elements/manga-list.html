@@ -6,7 +6,8 @@
   <template>
 		<style>
       .row {
-        height: 80px;
+        height: 500px;
+  			width: 400px;
 			  margin: 0;
 			  padding: 10px;
 			  border: 1px solid red;
@@ -19,7 +20,14 @@
 			 handleAs="json"
 			 response="{{mangaList}}"
 			 on-core-error="{{retryOnFail}}"></core-ajax>
-		<core-list id="list" data="{{mangaList.manga}}" height="20" style="min-height:1%">
+		<core-list
+			 id="list"
+			 style="min-height:10px"
+			 data="{{mangaList.manga}}"
+			 height="500"
+			 width="400"
+			 grid
+			 on-core-activate="{{selectManga}}">
 			<template>
 				<div class="row">
 					List row: {{index}}, User data from model: {{model.t}}
@@ -35,7 +43,13 @@
 		    window.setTimeout(function() {
 		        self.go();
   		    }, 1000);
-		  }
+		  },
+  		selectManga: function (event, detail, sender) {
+		    console.log(detail.data);
+		    this.fire('manga-selected', {
+		        id: detail.data.i,
+		        title: detail.data.t});
+      }
     });
 	</script>
 </polymer-element>

@@ -2,10 +2,9 @@
 <html>
   <head>
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
-		<link rel="import"
-					href="bower_components/core-scroll-header-panel/core-scroll-header-panel.html">
-		<link rel="import"
-					href="bower_components/core-toolbar/core-toolbar.html">
+		<link rel="import" href="bower_components/core-scroll-header-panel/core-scroll-header-panel.html">
+		<link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
+		<link rel="import" href="bower_components/core-pages/core-pages.html">
 		<link rel="import" href="elements/manga-list.html">
   </head>
 	<body fullbleed unresolved>
@@ -13,7 +12,20 @@
 			<core-toolbar>
 				<div>Manga App</div>
 			</core-toolbar>
-			<manga-list></manga-list>
+			<template is="auto-binding" id="page-template">
+				<core-pages id="pages" selected="0">
+					<manga-list on-manga-selected="{{switchToManga}}"></manga-list>
+					<div>Two</div>
+					<div>Three</div>
+				</core-pages>
+			</template>
+			<script>
+				var template = document.querySelector('#page-template');
+				template.switchToManga = function(event, detail, sender) {
+				  console.log(detail);
+				  template.$.pages.selected = 1;
+				}
+			</script>
 		</core-scroll-header-panel>
 	</body>
 </html>
