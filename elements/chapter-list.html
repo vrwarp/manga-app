@@ -1,0 +1,44 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/core-list/core-list.html">
+
+<polymer-element name="chapter-list" attributes="mangaId">
+  <template>
+		<style>
+     .row {
+			 margin: 0;
+			 padding: 10px;
+			 border: 1px solid red;
+     }
+    </style>
+		
+		<core-ajax
+			 id="ajax"
+			 handleAs="json"
+			 response="{{chapterList}}"></core-ajax>
+		<core-list
+			 id="list"
+			 style="min-height:10px"
+			 data="{{chapterList.chapters}}"
+			 height="50"
+			 on-core-activate="{{selectChapter}}">
+			<template>
+				<div class="row">
+					List row {{index}}: {{model[0]}}: {{model[2]}}
+				</div>
+			</template>
+		</core-list>
+  </template>
+	<script>
+    Polymer({
+		  mangaIdChanged: function (oldValue, newValue) {
+		    console.log(newValue);
+		    this.$.ajax.url = "http://www.corsproxy.com/www.mangaeden.com/api/manga/" + newValue + "/";
+		    this.$.ajax.go();
+  		},
+  		selectChapter: function (event, detail, sender) {
+		    console.log(detail);
+      }
+    });
+	</script>
+</polymer-element>
