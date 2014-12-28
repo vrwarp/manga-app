@@ -1,0 +1,41 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/core-list/core-list.html">
+
+<polymer-element name="manga-list">
+  <template>
+		<style>
+      .row {
+        height: 80px;
+			  margin: 0;
+			  padding: 10px;
+			  border: 1px solid red;
+      }
+    </style>
+
+		<core-ajax
+			 auto
+			 url="http://www.corsproxy.com/www.mangaeden.com/api/list/0/?p=0&l=200"
+			 handleAs="json"
+			 response="{{mangaList}}"
+			 on-core-error="{{retryOnFail}}"></core-ajax>
+		<core-list id="list" data="{{mangaList.manga}}" height="20" style="min-height:1%">
+			<template>
+				<div class="row">
+					List row: {{index}}, User data from model: {{model.t}}
+				</div>
+			</template>
+		</core-list>
+  </template>
+	<script>
+    Polymer({
+		  retryOnFail: function () {
+		    console.log("Failed, retrying in 1 second...");
+        var self = this;
+		    window.setTimeout(function() {
+		        self.go();
+  		    }, 1000);
+		  }
+    });
+	</script>
+</polymer-element>
