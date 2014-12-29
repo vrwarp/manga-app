@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-list/core-list.html">
+<link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
 
 <polymer-element name="manga-list">
   <template>
@@ -14,26 +15,32 @@
       }
     </style>
 
-		<core-ajax
-			 auto
-			 url="http://www.corsproxy.com/www.mangaeden.com/api/list/0/?p=0&l=200"
-			 handleAs="json"
-			 response="{{mangaList}}"
-			 on-core-error="{{retryOnFail}}"></core-ajax>
-		<core-list
-			 id="list"
-			 style="min-height:10px"
-			 data="{{mangaList.manga}}"
-			 height="500"
-			 width="400"
-			 grid
-			 on-core-activate="{{selectManga}}">
-			<template>
-				<div class="row">
-					List row: {{index}}, User data from model: {{model.t}}
-				</div>
-			</template>
-		</core-list>
+		<core-header-panel mode="seamed" fit>
+			<core-toolbar>
+				<div>Manga App</div>
+			</core-toolbar>
+
+			<core-ajax
+				 auto
+				 url="http://www.corsproxy.com/www.mangaeden.com/api/list/0/?p=0&l=200"
+				 handleAs="json"
+				 response="{{mangaList}}"
+				 on-core-error="{{retryOnFail}}"></core-ajax>
+			<core-list
+				 id="list"
+				 style="min-height:10px"
+				 data="{{mangaList.manga}}"
+				 height="500"
+				 width="400"
+				 grid
+				 on-core-activate="{{selectManga}}">
+				<template>
+					<div class="row">
+						List row: {{index}}, User data from model: {{model.t}}
+					</div>
+				</template>
+			</core-list>
+		</core-header-panel>
   </template>
 	<script>
     Polymer({

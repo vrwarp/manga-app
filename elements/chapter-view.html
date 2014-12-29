@@ -1,10 +1,10 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-list/core-list.html">
-<link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../bower_components/core-scroll-header-panel/core-scroll-header-panel.html">
 <link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
 
-<polymer-element name="chapter-list" attributes="mangaId mangaTitle">
+<polymer-element name="chapter-view" attributes="chapterId chapterNumber chapterTitle">
   <template>
 		<style>
      .row {
@@ -14,46 +14,44 @@
      }
     </style>
 		
-		<core-scroll-panel fit>
+		<core-scroll-header-panel fit>
 			<core-toolbar>
         <core-icon-button icon="arrow-back" on-click="{{backClicked}}"></core-icon-button>
-				<div>{{mangaTitle}}</div>
+				<div>Chapter {{chapterNumber}}: {{chapterTitle}}</div>
 			</core-toolbar>
 
 			<core-ajax
 				 id="ajax"
 				 handleAs="json"
-				 response="{{chapterList}}"></core-ajax>
+				 on-core-response="{{handleResponse}}"></core-ajax>
 			<core-list
 				 id="list"
 				 style="min-height:10px"
-				 data="{{chapterList.chapters}}"
-				 height="50"
-				 on-core-activate="{{selectChapter}}">
+				 height="1600">
 				<template>
-					<div class="row" horizontal layout>
-						<div>Chapter {{model[0]}}: {{model[2]}}</div>
-						<div flex></div>
-						<div>{{dateFromEpoch(model[1])}}</div>
+					<div>
+						<img src="https://cdn.mangaeden.com/mangasimg/{{model[1]}}" width="{{model[2]}}" height="{{model[3]}}">
 					</div>
 				</template>
 			</core-list>
-		</core-scroll-panel>
+		</core-scroll-header-panel>
   </template>
 	<script>
     Polymer({
-		  mangaIdChanged: function (oldValue, newValue) {
+		  chapterIdChanged: function (oldValue, newValue) {
 		    console.log(newValue);
-		    this.$.ajax.url = "http://www.corsproxy.com/www.mangaeden.com/api/manga/" + newValue + "/";
+		    this.$.list.data = [];
+		    this.$.ajax.url = "http://www.corsproxy.com/www.mangaeden.com/api/chapter/" + newValue + "/";
 		    this.$.ajax.go();
   		},
-  		selectChapter: function (event, detail, sender) {
-		    console.log(detail);
-		    this.fire("chapter-selected", {
-		        id: detail.data[3],
-		        number: detail.data[0],
-		        title: detail.data[2]});
-      },
+		  ascendingImageData: function (a, b) {
+		    return a[0] - b[0];
+		  },
+		  handleResponse: function (event, detail, sender) {
+		    var images = detail.response.images;
+		    images.sort(this.ascendingImageData);
+		    this.$.list.data = images;
+		  },
 		  backClicked: function () {
 		    this.fire("back", {});
 		  },

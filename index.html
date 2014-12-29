@@ -2,36 +2,47 @@
 <html>
 	<head>
 		<script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
-		<link rel="import" href="bower_components/core-scroll-header-panel/core-scroll-header-panel.html">
 		<link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
 		<link rel="import" href="bower_components/core-pages/core-pages.html">
 		<link rel="import" href="elements/manga-list.html">
 		<link rel="import" href="elements/chapter-list.html">
+		<link rel="import" href="elements/chapter-view.html">
 	</head>
 	<body fullbleed unresolved>
-		<core-scroll-header-panel fit>
-			<core-toolbar>
-				<div>Manga App</div>
-			</core-toolbar>
-			<template is="auto-binding" id="page-template">
-				<core-pages id="pages" selected="0">
-					<manga-list id="mangaList" on-manga-selected="{{switchToManga}}"></manga-list>
-					<chapter-list id="chapterList" on-chapter-selected="{{switchToChapter}}"></chapter-list>
-					<div>Three</div>
-				</core-pages>
-			</template>
-			<script>
-			 var template = document.querySelector('#page-template');
-			 template.switchToManga = function(event, detail, sender) {
-				 console.log(detail);
-				 template.$.pages.selected = 1;
-			   template.$.chapterList.mangaId = detail.id;
-			 }
-			 template.switchToChapter = function(event, detail, sender) {
-				 console.log(detail);
-			 }
-			</script>
-		</core-scroll-header-panel>
+		<template is="auto-binding" id="page-template">
+			<core-pages id="pages" selected="0" fit>
+				<manga-list id="mangaList" on-manga-selected="{{switchToManga}}"></manga-list>
+				<chapter-list
+					 id="chapterList"
+					 on-chapter-selected="{{switchToChapter}}"
+					 on-back="{{switchToMangaList}}"></chapter-list>
+				<chapter-view
+					 id="chapterView"
+					 on-back="{{switchToChapterList}}"></chapter-view>
+			</core-pages>
+		</template>
+		<script>
+			var template = document.querySelector('#page-template');
+			template.switchToMangaList = function(event, detail, sender) {
+			  template.$.pages.selected = 0;
+			}
+			template.switchToManga = function(event, detail, sender) {
+			  console.log(detail);
+			  template.$.chapterList.mangaTitle = detail.title;
+			  template.$.chapterList.mangaId = detail.id;
+			  template.$.pages.selected = 1;
+			}
+			template.switchToChapter = function(event, detail, sender) {
+		  	console.log(detail);
+			  template.$.chapterView.chapterTitle = detail.title;
+			  template.$.chapterView.chapterNumber = detail.number;
+			  template.$.chapterView.chapterId = detail.id;
+			  template.$.pages.selected = 2;
+			}
+			template.switchToChapterList = function(event, detail, sender) {
+			  template.$.pages.selected = 1;
+			}
+		</script>
 	</body>
 </html>
 
