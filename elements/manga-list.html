@@ -2,6 +2,10 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-list/core-list.html">
 <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
+<link rel="import" href="../bower_components/core-a11y-keys/core-a11y-keys.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
 
 <polymer-element name="manga-list">
   <template>
@@ -17,19 +21,46 @@
 
 		<core-header-panel mode="seamed" fit>
 			<core-toolbar>
-				<div>Manga App</div>
+				<core-animated-pages
+					 id="toolbarPages"
+					 transitions="hero-transition cross-fade"
+					 fit>
+					<section horizontal layout center>
+						<div cross-fade>Manga App</div>
+						<div flex></div>
+						<paper-icon-button
+							 hero
+							 hero-id="search"
+							 icon="search"
+							 on-click="{{activateSearch}}"></paper-icon-button>
+					</section>
+					<section horizontal layout center>
+						<paper-icon-button
+							 hero
+							 hero-id="search"
+							 icon="search"
+							 on-click="{{deactivateSearch}}"></paper-icon-button>
+						<paper-input
+							 cross-fade
+							 id="searchInput"
+							 label="Manga"
+							 committedValue="{{searchFilter}}"
+							 flex>
+							<core-a11y-keys keys="esc" on-keys-pressed="{{deactivateSearch}}"></core-a11y-keys>
+						</paper-input>
+					</section>
+				</core-animated-pages>
 			</core-toolbar>
 
 			<core-ajax
 				 auto
-				 url="https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/list/0/?p=0&l=200"
+				 url="https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/list/0/"
 				 handleAs="json"
-				 response="{{mangaList}}"
+				 on-core-response="{{updateMangaList}}"
 				 on-core-error="{{retryOnFail}}"></core-ajax>
 			<core-list
 				 id="list"
 				 style="min-height:10px"
-				 data="{{mangaList.manga}}"
 				 height="500"
 				 width="400"
 				 grid
@@ -56,7 +87,39 @@
 		    this.fire('manga-selected', {
 		        id: detail.data.i,
 		        title: detail.data.t});
-      }
+      },
+		  activateSearch: function (event, detail, sender) {
+		    this.$.searchInput.value = "";
+		    this.$.searchInput.committedValue = "";
+		    this.$.toolbarPages.selected = 1;
+
+		    var searchInput = this.$.searchInput;
+		    window.setTimeout(function() {
+		        searchInput.$.decorator.input.focus();
+		      }, 0);
+		  },
+		  deactivateSearch: function (event, detail, sender) {
+		    this.$.searchInput.value = "";
+		    this.$.searchInput.committedValue = "";
+		    this.$.toolbarPages.selected = 0;
+		  },
+		  applyFilter: function (manga) {
+	      var filterString = this.$.searchInput.value;
+		    if (filterString == "") {
+		      return true;
+		    }
+		    var filter = new RegExp(filterString, "i");
+		    return filter.test(manga.t);
+		  },
+		  mangaList: [],
+		  updateMangaList: function (event, detail, sender) {
+		    this.mangaList = detail.response.manga;
+		    this.searchFilterChanged("", this.$.searchInput.value);
+		  },
+		  searchFilterChanged: function (oldValue, newValue) {
+		    this.$.list.data = this.mangaList.filter(
+		      this.applyFilter, this);
+		  }
     });
 	</script>
 </polymer-element>
