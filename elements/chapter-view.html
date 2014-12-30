@@ -52,6 +52,8 @@
 		    var images = detail.response.images;
 		    images.sort(this.ascendingImageData);
 		    this.$.list.data = images;
+		    this.$.list.scrollToItem(0);
+		    // TODO: Adjust list.height to be the average height of the new data.
 		  },
 		  backClicked: function () {
 		    this.$.list.data = [];
