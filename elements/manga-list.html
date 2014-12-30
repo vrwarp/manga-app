@@ -26,7 +26,7 @@
 					 transitions="hero-transition cross-fade"
 					 fit>
 					<section horizontal layout center>
-						<div cross-fade>Manga App</div>
+						<div class="bottom indent" cross-fade>Manga App</div>
 						<div flex></div>
 						<paper-icon-button
 							 hero
@@ -118,7 +118,7 @@
 		  },
 		  searchFilterChanged: function (oldValue, newValue) {
 		    this.$.list.data = this.mangaList.filter(
-		      this.applyFilter, this);
+		      this.applyFilter, this).slice(0, 25);
 		  }
     });
 	</script>
