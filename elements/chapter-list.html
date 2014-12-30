@@ -44,7 +44,7 @@
     Polymer({
 		  mangaIdChanged: function (oldValue, newValue) {
 		    console.log(newValue);
-		    this.$.ajax.url = "http://www.corsproxy.com/www.mangaeden.com/api/manga/" + newValue + "/";
+		    this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + newValue + "/";
 		    this.$.ajax.go();
   		},
   		selectChapter: function (event, detail, sender) {

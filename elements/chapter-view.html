@@ -41,7 +41,7 @@
 		  chapterIdChanged: function (oldValue, newValue) {
 		    console.log(newValue);
 		    this.$.list.data = [];
-		    this.$.ajax.url = "http://www.corsproxy.com/www.mangaeden.com/api/chapter/" + newValue + "/";
+		    this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/chapter/" + newValue + "/";
 		    this.$.ajax.go();
   		},
 		  ascendingImageData: function (a, b) {
