@@ -86,9 +86,8 @@
 		  },
   		selectManga: function (event, detail, sender) {
 		    console.log(detail.data);
-		    this.fire('manga-selected', {
-		        id: detail.data.i,
-		        title: detail.data.t});
+		    document.querySelector("app-router").go(
+		      "/" + escape(detail.data.i) + "/" + escape(detail.data.t));
       },
 		  activateSearch: function (event, detail, sender) {
 		    this.$.searchInput.value = "";

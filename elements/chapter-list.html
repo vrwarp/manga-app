@@ -45,6 +45,11 @@
   </template>
 	<script>
     Polymer({
+		  ready: function() {
+		    if (this.mangaId) {
+		      this.mangaIdChanged("", this.mangaId);
+		    }
+		  },
 		  mangaIdChanged: function (oldValue, newValue) {
 		    console.log(newValue);
 		    this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + newValue + "/";
@@ -52,13 +57,14 @@
   		},
   		selectChapter: function (event, detail, sender) {
 		    console.log(detail);
-		    this.fire("chapter-selected", {
-		        id: detail.data[3],
-		        number: detail.data[0],
-		        title: detail.data[2]});
+		    var chapterId = detail.data[3];
+		    var chapterNumber = detail.data[0];
+		    var chapterTitle = detail.data[2];
+		    document.querySelector("app-router").go(
+		      "/" + [this.mangaId, this.mangaTitle, chapterId, chapterNumber, chapterTitle].map(escape).join("/"));
       },
 		  backClicked: function () {
-		    this.fire("back", {});
+		    document.querySelector("app-router").go("/");
 		  },
 		  dateFromEpoch: function (seconds) {
 		    return (new Date(seconds * 1000)).toLocaleDateString();

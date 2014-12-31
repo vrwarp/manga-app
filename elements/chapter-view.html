@@ -4,7 +4,7 @@
 <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 
-<polymer-element name="chapter-view" attributes="chapterId chapterNumber chapterTitle">
+<polymer-element name="chapter-view" attributes="mangaId mangaTitle chapterId chapterNumber chapterTitle">
   <template>
 		<style>
      .row {
@@ -43,6 +43,11 @@
   </template>
 	<script>
     Polymer({
+		  ready: function() {
+		    if (this.chapterId) {
+		      this.chapterIdChanged("", this.chapterId);
+		    }
+		  },
 		  chapterIdChanged: function (oldValue, newValue) {
 		    console.log(newValue);
 		    this.$.list.data = [];
@@ -61,6 +66,8 @@
 		  },
 		  backClicked: function () {
 		    this.$.list.data = [];
+		    document.querySelector("app-router").go(
+		      "/" + escape(this.mangaId) + "/" + escape(this.mangaTitle));
 		    this.fire("back", {});
 		  },
 		  dateFromEpoch: function (seconds) {
