@@ -7,14 +7,10 @@
 <polymer-element name="chapter-view" attributes="mangaId mangaTitle chapterId chapterNumber chapterTitle">
   <template>
 		<style>
-     .row {
-			 margin: 0;
-			 padding: 10px;
-			 border: 1px solid red;
-		   width: 100%;
-     }
-		 .row img {
+		 .page img {
 		   max-width: 100%;
+		   margin: 0 auto;
+		   display: block;
 		 }
     </style>
 		
@@ -34,8 +30,8 @@
 				 style="min-height:10px"
 				 height="1000">
 				<template>
-					<div horizontal center-justified layout>
-						<img src="https://cdn.mangaeden.com/mangasimg/{{model[1]}}" width="{{model[2]}}" height="{{model[3]}}">
+					<div class="page" >
+						<img src="https://cdn.mangaeden.com/mangasimg/{{model[1]}}">
 					</div>
 				</template>
 			</core-list>
@@ -43,6 +39,7 @@
   </template>
 	<script>
     Polymer({
+		//  width="{{model[2]}}" height="{{model[3]}}"
 		  ready: function() {
 		    if (this.chapterId) {
 		      this.chapterIdChanged("", this.chapterId);
