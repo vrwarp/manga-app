@@ -30,7 +30,6 @@
 				 fit
 				 id="list"
 				 style="min-height:10px"
-				 data="{{chapterList}}"
 				 height="50"
 				 on-core-activate="{{selectChapter}}">
 				<template>
@@ -46,26 +45,30 @@
 	<script>
 		(function() {
 		  var chapterList_ = [];
+		  var mangaId_ = "some filler value";
       Polymer({
-		    ready: function() {
-		      if (this.mangaId) {
-		        this.mangaIdChanged(this.mangaId, this.mangaId);
+		    domReady: function() {
+		      if (this.mangaId == mangaId_) {
+		        this.$.list.data = chapterList_;
 		      }
 		    },
 		    mangaIdChanged: function (oldValue, newValue) {
+		      if (mangaId_ == newValue) {
+		        return;
+		      }
+
 		      console.log(newValue);
 
 		      // Clear the chapterList_ if it isn't the same.
-		      if (oldValue != newValue) {
-		        chapterList_.splice(0, chapterList_.length);
-		      }
+		      chapterList_.splice(0, chapterList_.length);
 
 		      this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + newValue + "/";
 		      this.$.ajax.go();
   		  },
 		    chapterListResponseChanged: function (oldValue, newValue) {
-		      chapterList_.splice.apply(
-		        chapterList_, [0, chapterList_.length].concat(newValue.chapters));
+		      chapterList_ = newValue.chapters;
+		      mangaId_ = this.mangaId;
+		      this.$.list.data = chapterList_;
   		  },
 		    get chapterList() {
 		      return chapterList_;
