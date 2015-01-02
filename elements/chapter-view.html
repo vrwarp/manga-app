@@ -3,6 +3,7 @@
 <link rel="import" href="../bower_components/core-list/core-list.html">
 <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="resize-listener.html">
 
 <polymer-element name="chapter-view" attributes="mangaId mangaTitle chapterId chapterNumber chapterTitle">
   <template>
@@ -28,7 +29,8 @@
 				 id="list"
 				 fit
 				 style="min-height:10px"
-				 height="1000">
+				 height="1000"
+				 style="transform: scale3d({{scaleFactor}},{{scaleFactor}},1)">
 				<template>
 					<div class="page" >
 						<img src="https://cdn.mangaeden.com/mangasimg/{{model[1]}}">
@@ -41,9 +43,19 @@
     Polymer({
 		//  width="{{model[2]}}" height="{{model[3]}}"
 		  ready: function() {
+		    console.log("AHHH");
 		    if (this.chapterId) {
 		      this.chapterIdChanged("", this.chapterId);
 		    }
+		  },
+		  domReady: function() {
+		    this.listWidth = Math.max(1, this.$.list.offsetWidth);
+		    this.medianImageWidth = 256; // Some "reasonable" default.
+		    this.scaleFactor = this.listWidth / this.medianImageWidth;
+		    var self = this;
+		    window.addResizeListener(this.$.list, function() {
+		        self.listWidth = Math.max(1, self.$.list.offsetWidth);
+		      });
 		  },
 		  chapterIdChanged: function (oldValue, newValue) {
 		    console.log(newValue);
@@ -54,9 +66,18 @@
 		  ascendingImageData: function (a, b) {
 		    return a[0] - b[0];
 		  },
+		  ascendingImageWidth: function (a, b) {
+		    return a[2] - b[2];
+		  },
 		  handleResponse: function (event, detail, sender) {
 		    var images = detail.response.images;
+
+		    images.sort(this.ascendingImageWidth);
+		    this.medianImageWidth = Math.max(256, images[Math.floor(images.length/2)][2]);
+		    console.log("Median width updated to " + this.medianImageWidth);
+
 		    images.sort(this.ascendingImageData);
+
 		    this.$.list.data = images;
 		    this.$.list.scrollToItem(0);
 		    // TODO: Adjust list.height to be the average height of the new data.
