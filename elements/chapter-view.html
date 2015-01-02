@@ -9,7 +9,6 @@
   <template>
 		<style>
 		 .page img {
-		   max-width: 100%;
 		   margin: 0 auto;
 		   display: block;
 		 }
@@ -29,11 +28,12 @@
 				 id="list"
 				 fit
 				 style="min-height:10px"
-				 height="1000"
-				 style="transform: scale3d({{scaleFactor}},{{scaleFactor}},1)">
+				 height="1000">
 				<template>
 					<div class="page" >
-						<img src="https://cdn.mangaeden.com/mangasimg/{{model[1]}}">
+						<img src="https://cdn.mangaeden.com/mangasimg/{{model[1]}}"
+								 width="{{listWidth > model[2] ? model[2] : listWidth}}"
+								 height="{{model[3] * ((listWidth > model[2] ? model[2] : listWidth) / model[2])}}">
 					</div>
 				</template>
 			</core-list>
@@ -43,7 +43,6 @@
     Polymer({
 		//  width="{{model[2]}}" height="{{model[3]}}"
 		  ready: function() {
-		    console.log("AHHH");
 		    if (this.chapterId) {
 		      this.chapterIdChanged("", this.chapterId);
 		    }
@@ -51,7 +50,7 @@
 		  domReady: function() {
 		    this.listWidth = Math.max(1, this.$.list.offsetWidth);
 		    this.medianImageWidth = 256; // Some "reasonable" default.
-		    this.scaleFactor = this.listWidth / this.medianImageWidth;
+
 		    var self = this;
 		    window.addResizeListener(this.$.list, function() {
 		        self.listWidth = Math.max(1, self.$.list.offsetWidth);
