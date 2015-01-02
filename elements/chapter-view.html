@@ -12,6 +12,10 @@
 		   margin: 0 auto;
 		   display: block;
 		 }
+
+		 .page {
+		   width: 100%;
+		 }
     </style>
 		
 		<core-ajax
@@ -28,7 +32,7 @@
 				 id="list"
 				 fit
 				 style="min-height:10px"
-				 height="1000">
+				 height="{{medianImageHeight * ((listWidth > medianImageWidth ? medianImageWidth : listWidth) / medianImageWidth)}}">
 				<template>
 					<div class="page" >
 						<img src="https://cdn.mangaeden.com/mangasimg/{{model[1]}}"
@@ -46,14 +50,17 @@
 		    if (this.chapterId) {
 		      this.chapterIdChanged("", this.chapterId);
 		    }
+
+		    this.medianImageWidth = 256; // Some "reasonable" default.
+		    this.medianImageHeight = 1024; // Some "reasonable" default.
+		    this.listWidth = 1024; // Some "reasonable" default.
 		  },
 		  domReady: function() {
-		    this.listWidth = Math.max(1, this.$.list.offsetWidth);
-		    this.medianImageWidth = 256; // Some "reasonable" default.
+		    this.listWidth = Math.max(1024, this.$.list.clientWidth);
 
 		    var self = this;
 		    window.addResizeListener(this.$.list, function() {
-		        self.listWidth = Math.max(1, self.$.list.offsetWidth);
+		        self.listWidth = Math.max(1, self.$.list.clientWidth);
 		      });
 		  },
 		  chapterIdChanged: function (oldValue, newValue) {
@@ -68,12 +75,24 @@
 		  ascendingImageWidth: function (a, b) {
 		    return a[2] - b[2];
 		  },
+		  ascendingImageHeight: function (a, b) {
+		    return a[3] - b[3];
+		  },
 		  handleResponse: function (event, detail, sender) {
 		    var images = detail.response.images;
 
-		    images.sort(this.ascendingImageWidth);
-		    this.medianImageWidth = Math.max(256, images[Math.floor(images.length/2)][2]);
+		    if (!images || images.length == 0) {
+		      this.$.list.data = [];
+		      return;
+		    }
+
+        images.sort(this.ascendingImageWidth);
+        this.medianImageWidth = Math.max(256, images[Math.floor(images.length/2)][2]);
 		    console.log("Median width updated to " + this.medianImageWidth);
+
+        images.sort(this.ascendingImageHeight);
+        this.medianImageHeight = Math.max(1024, images[Math.floor(images.length/2)][3]);
+		    console.log("Median height updated to " + this.medianImageHeight);
 
 		    images.sort(this.ascendingImageData);
 
