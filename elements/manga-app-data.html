@@ -1,0 +1,20 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
+
+<polymer-element name="manga-app-data">
+  <template>
+		<core-ajax id="ajax" handleAs="json"></core-ajax>
+		<!-- Consider switching to polymer-localforage -->
+		<!--
+		<core-localstorage name="mangaAppData" value="{{value}}"></core-localstorage>
+		-->
+
+  </template>
+	<script>
+		(function() {
+      Polymer({
+      });
+		})();
+	</script>
+</polymer-element>
