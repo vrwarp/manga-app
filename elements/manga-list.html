@@ -137,6 +137,7 @@
 		      this.$.searchInput.value = "";
 		      this.$.searchInput.committedValue = "";
 		      this.$.toolbarPages.selected = 0;
+		      window.history.replaceState(null, null, "#/");
 		    },
 		    applyFilter: function (manga) {
 	        var filterString = this.$.searchInput.value;
@@ -158,6 +159,9 @@
 		    searchFilterChanged: function (oldValue, newValue) {
 		      this.$.list.data = this.mangaList.filter(
 		        this.applyFilter, this);
+		      if (newValue) {
+		        window.history.replaceState(null, null, "#/search/" + escape(newValue));
+		      }
 		    }
       });
 		})();
