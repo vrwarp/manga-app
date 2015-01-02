@@ -76,51 +76,61 @@
 		</core-header-panel>
   </template>
 	<script>
-    Polymer({
-		  retryOnFail: function () {
-		    console.log("Failed, retrying in 1 second...");
-        var self = this;
-		    window.setTimeout(function() {
-		        self.go();
-  		    }, 1000);
-		  },
-  		selectManga: function (event, detail, sender) {
-		    console.log(detail.data);
-		    document.querySelector("app-router").go(
-		      "/" + escape(detail.data.i) + "/" + escape(detail.data.t));
-      },
-		  activateSearch: function (event, detail, sender) {
-		    this.$.searchInput.value = "";
-		    this.$.searchInput.committedValue = "";
-		    this.$.toolbarPages.selected = 1;
+		(function() {
+		  var mangaList_ = [];
+      Polymer({
+		    retryOnFail: function () {
+		      console.log("Failed, retrying in 1 second...");
+          var self = this;
+		      window.setTimeout(function() {
+		          self.go();
+  		      }, 1000);
+		    },
+  		  selectManga: function (event, detail, sender) {
+		      console.log(detail.data);
+		      document.querySelector("app-router").go(
+		        "/" + escape(detail.data.i) + "/" + escape(detail.data.t));
+        },
+		    activateSearch: function (event, detail, sender) {
+		      this.$.searchInput.value = "";
+		      this.$.searchInput.committedValue = "";
+		      this.$.toolbarPages.selected = 1;
 
-		    var searchInput = this.$.searchInput;
-		    window.setTimeout(function() {
-		        searchInput.$.decorator.input.focus();
-		      }, 0);
-		  },
-		  deactivateSearch: function (event, detail, sender) {
-		    this.$.searchInput.value = "";
-		    this.$.searchInput.committedValue = "";
-		    this.$.toolbarPages.selected = 0;
-		  },
-		  applyFilter: function (manga) {
-	      var filterString = this.$.searchInput.value;
-		    if (filterString == "") {
-		      return true;
+		      var searchInput = this.$.searchInput;
+		      window.setTimeout(function() {
+		          searchInput.$.decorator.input.focus();
+		        }, 0);
+		    },
+		    deactivateSearch: function (event, detail, sender) {
+		      this.$.searchInput.value = "";
+		      this.$.searchInput.committedValue = "";
+		      this.$.toolbarPages.selected = 0;
+		    },
+		    applyFilter: function (manga) {
+	        var filterString = this.$.searchInput.value;
+		      if (filterString == "") {
+		        return true;
+		      }
+		      var filter = new RegExp(filterString, "i");
+		      return filter.test(manga.t);
+		    },
+		    get mangaList() {
+		      return mangaList_;
+		    },
+		    updateMangaList: function (event, detail, sender) {
+		      mangaList_.splice.apply(
+		        mangaList_,
+		        [0, mangaList_.length].concat(detail.response.manga));
+		      this.searchFilterChanged("", this.$.searchInput.value);
+		    },
+		    searchFilterChanged: function (oldValue, newValue) {
+		      this.$.list.data = this.mangaList.filter(
+		        this.applyFilter, this);
+		    },
+		    domReady: function() {
+		      this.$.list.data = this.mangaList;
 		    }
-		    var filter = new RegExp(filterString, "i");
-		    return filter.test(manga.t);
-		  },
-		  mangaList: [],
-		  updateMangaList: function (event, detail, sender) {
-		    this.mangaList = detail.response.manga;
-		    this.searchFilterChanged("", this.$.searchInput.value);
-		  },
-		  searchFilterChanged: function (oldValue, newValue) {
-		    this.$.list.data = this.mangaList.filter(
-		      this.applyFilter, this);
-		  }
-    });
+      });
+		})();
 	</script>
 </polymer-element>
