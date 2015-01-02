@@ -7,7 +7,7 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 
-<polymer-element name="manga-list">
+<polymer-element name="manga-list" attributes="searchFilter">
   <template>
 		<style>
       .row {
@@ -104,6 +104,13 @@
 		(function() {
 		  var mangaList_ = [];
       Polymer({
+		    domReady: function() {
+		      if (this.searchFilter) {
+		        this.$.searchInput.value = this.searchFilter;
+		        this.$.toolbarPages.selected = 1;
+		      }
+		      this.$.list.data = this.mangaList;
+		    },
 		    retryOnFail: function () {
 		      console.log("Failed, retrying in 1 second...");
           var self = this;
@@ -151,9 +158,6 @@
 		    searchFilterChanged: function (oldValue, newValue) {
 		      this.$.list.data = this.mangaList.filter(
 		        this.applyFilter, this);
-		    },
-		    domReady: function() {
-		      this.$.list.data = this.mangaList;
 		    }
       });
 		})();

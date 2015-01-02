@@ -22,7 +22,11 @@
 	</head>
 	<body fullbleed unresolved>
 		<app-router core-animated-pages mode="hash">
-			<app-route path="/:mangaId/:mangaTitle/:chapterId/:chapterNumber/:chapterTitle"
+			<app-route path="/search/:searchFilter"
+								 import="elements/manga-list.html">
+			</app-route>
+
+ 			<app-route path="/:mangaId/:mangaTitle/:chapterId/:chapterNumber/:chapterTitle"
 								 import="elements/chapter-view.html">
 			</app-route>
 			
