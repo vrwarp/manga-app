@@ -58,10 +58,10 @@
 
 		    this.medianImageWidth = 256; // Some "reasonable" default.
 		    this.medianImageHeight = 1024; // Some "reasonable" default.
-		    this.listWidth = 1024; // Some "reasonable" default.
+		    this.listWidth = 360; // Some "reasonable" default.
 		  },
 		  domReady: function() {
-		    this.listWidth = Math.max(1024, this.$.list.clientWidth);
+		    this.listWidth = Math.max(360, this.$.list.clientWidth);
 
 		    var self = this;
 		    window.addResizeListener(this.$.list, function() {
