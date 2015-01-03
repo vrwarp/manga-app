@@ -16,21 +16,23 @@
 			.fill {
 			  height: 100%;
 			}
+
+			paper-shadow {
+			  background-color: #FFF;
+			};
     </style>
 
 		<div fit style="padding: 10px">
-			<paper-shadow z="2" style="width:100%;height:100%">
-				<div vertical layout style="width:100%;height:100%">
-					<core-image
-						 flex
-						 src="{{manga.image}}"
-						 sizing="cover"
-						 preload
-						 loading="{{imageLoading}}"></core-image>
-					<div class="mangaTitle {{{fill : imageLoading} | tokenList}}"
-							 title="{{manga.title}}">
-						{{manga.title}}
-					</div>
+			<paper-shadow z="2" vertical layout style="width:100%;height:100%">
+				<core-image
+					 flex
+					 src="{{manga.image}}"
+					 sizing="cover"
+					 preload
+					 loading="{{imageLoading}}"></core-image>
+				<div class="mangaTitle {{{fill : imageLoading} | tokenList}}"
+						 title="{{manga.title}}">
+					{{manga.title}}
 				</div>
 			</paper-shadow>
 		</div>

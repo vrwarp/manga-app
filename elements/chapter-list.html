@@ -20,6 +20,7 @@
 		   padding: 10px;
 		   width: 100%;
 		   height: 100%;
+		   background-color: #FFF;
 		 }
 
 		 .title {
@@ -36,6 +37,10 @@
 		 core-toolbar {
 		   background-color: #4CAF50;
 		   color: #FFF;
+		 }
+
+		 core-list {
+		   background-color: #EEE;
 		 }
     </style>
 		
@@ -111,7 +116,7 @@
   		  selectChapter: function (event, detail, sender) {
 		      console.log(detail);
 		      document.querySelector("app-router").go(
-		        "/" + [this.mangaId, this.mangaTitle, detail.id, detail.number, detail.title].map(escape).join("/"));
+		        "/" + [this.mangaId, this.mangaTitle, detail.data.id, detail.data.number, detail.data.title].map(escape).join("/"));
         },
 		    backClicked: function () {
 		      document.querySelector("app-router").go("/");
