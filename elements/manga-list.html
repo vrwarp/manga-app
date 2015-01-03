@@ -11,7 +11,7 @@
 <polymer-element name="manga-list" attributes="searchFilter">
   <template>
 		<style>
-      .row {
+      .card {
         height: 450px;
   			width: 300px;
 			  margin: 0;
@@ -101,7 +101,7 @@
 				 grid
 				 on-core-activate="{{selectManga}}">
 				<template>
-					<div class="row">
+					<div class="card">
 						<manga-list-item manga="{{model}}"></manga-list-item>
 					</div>
 				</template>
