@@ -3,16 +3,34 @@
 <link rel="import" href="../bower_components/core-list/core-list.html">
 <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
 
 <polymer-element name="chapter-list" attributes="mangaId mangaTitle">
   <template>
 		<style>
-     .row {
+     .card {
 			 margin: 0;
-			 padding: 10px;
-			 border: 1px solid red;
-		   width: 100%;
+			 padding: 20px;
+		   width: 360px;
+		   height: 180px;
      }
+
+		 .card > paper-shadow {
+		   padding: 10px;
+		   width: 100%;
+		   height: 100%;
+		 }
+
+		 .title {
+		   font-size: 24px;
+		 }
+
+		 .chapterNumber {
+		 }
+
+		 .date {
+		   text-align: right;
+		 }
 
 		 core-toolbar {
 		   background-color: #4CAF50;
@@ -35,13 +53,18 @@
 				 fit
 				 id="list"
 				 style="min-height:10px"
-				 height="50"
+				 width="360"
+				 height="180"
+				 grid
 				 on-core-activate="{{selectChapter}}">
 				<template>
-					<div class="row" horizontal layout>
-						<div>Chapter {{model[0]}}: {{model[2]}}</div>
-						<div flex></div>
-						<div>{{dateFromEpoch(model[1])}}</div>
+					<div class="card">
+						<paper-shadow z="2" vertical layout>
+							<div class="title">{{model[2]}}</div>
+							<div class="chapterNumber">Chapter {{model[0]}}</div>
+							<div flex></div>
+							<div class="date">{{dateFromEpoch(model[1])}}</div>
+						</paper-shadow>
 					</div>
 				</template>
 			</core-list>
@@ -90,7 +113,7 @@
 		      document.querySelector("app-router").go("/");
 		    },
 		    dateFromEpoch: function (seconds) {
-		      return (new Date(seconds * 1000)).toLocaleDateString();
+		      return (new Date(seconds * 1000)).toLocaleDateString(undefined, {year: "2-digit", month: "2-digit", day: "2-digit"});
 		    }
       });
 		})();
