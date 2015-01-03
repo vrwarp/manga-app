@@ -6,17 +6,25 @@
 <link rel="import" href="../bower_components/core-a11y-keys/core-a11y-keys.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="manga-list-item.html">
 
 <polymer-element name="manga-list" attributes="searchFilter">
   <template>
 		<style>
       .row {
-        height: 350px;
+        height: 545px;
   			width: 350px;
 			  margin: 0;
 			  padding: 10px;
-			  border: 1px solid red;
       }
+
+			.mangaTitle {
+			  height: 20px;
+			  margin: 10px;
+			  white-space: nowrap;
+			  overflow: hidden;
+			  text-overflow: ellipsis;
+			}
 
 			core-toolbar {
 		    background-color: #4CAF50;
@@ -88,13 +96,13 @@
 				 fit
 				 id="list"
 				 style="min-height:10px"
-				 height="350"
+				 height="525"
 				 width="350"
 				 grid
 				 on-core-activate="{{selectManga}}">
 				<template>
 					<div class="row">
-						{{model.title}}
+						<manga-list-item manga="{{model}}"></manga-list-item>
 					</div>
 				</template>
 			</core-list>
@@ -145,13 +153,13 @@
 		        return true;
 		      }
 		      var filter = new RegExp(filterString, "i");
-		      return filter.test(manga.t);
+		      return filter.test(manga.title);
 		    },
 		    convertToExpectedModel: function (model) {
 		      return {
 		        title: model.t,
 		        id: model.i,
-		        image: model.im,
+		        image: model.im ? "https://cdn.mangaeden.com/mangasimg/" + model.im : undefined,
 		        latestChapterDate: model.ld
 		      };
 		    },
@@ -162,6 +170,9 @@
 		    searchFilterChanged: function (oldValue, newValue) {
 		      this.$.list.data = mangaList_.filter(
 		        this.applyFilter, this);
+		      if (this.$.list.data.length) {
+		        this.$.list.scrollToItem(0);
+		      }
 		      if (newValue) {
 		        window.history.replaceState(null, null, "#/search/" + escape(newValue));
 		      }

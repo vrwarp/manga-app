@@ -1,0 +1,37 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-image/core-image.html">
+<link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
+
+<polymer-element name="manga-list-item" attributes="manga" noscript>
+  <template>
+		<style>
+			.mangaTitle {
+			  height: 20px;
+			  margin: 10px;
+			  white-space: nowrap;
+			  overflow: hidden;
+			  text-overflow: ellipsis;
+			}
+
+			.fill {
+			  height: 100%;
+			}
+    </style>
+
+		<div fit style="padding: 10px">
+			<paper-shadow z="2" style="width:100%;height:100%">
+				<div vertical layout style="width:100%;height:100%">
+					<core-image
+						 flex
+						 src="{{manga.image}}"
+						 sizing="cover"
+						 preload
+						 loading="{{imageLoading}}"></core-image>
+					<div class="mangaTitle {{{fill : imageLoading} | tokenList}}">
+						{{manga.title}}
+					</div>
+				</div>
+			</paper-shadow>
+		</div>
+  </template>
+</polymer-element>
