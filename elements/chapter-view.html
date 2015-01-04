@@ -8,24 +8,24 @@
 <polymer-element name="chapter-view" attributes="mangaId mangaTitle chapterId chapterNumber chapterTitle">
   <template>
 		<style>
-		 .page img {
-		   margin: 0 auto;
-		   display: block;
-		 }
-
-		 .page {
-		   width: 100%;
-		 }
-
-		 core-toolbar {
-		   background-color: #4CAF50;
-		   color: #FFF;
-		 }
-
-		 core-list {
-		   background-color: #EEE;
-		 }
-    </style>
+			.page img {
+					margin: 0 auto;
+					display: block;
+			}
+			
+			.page {
+					width: 100%;
+			}
+			
+			core-toolbar {
+					background-color: #4CAF50;
+					color: #FFF;
+			}
+			
+			core-list {
+					background-color: #EEE;
+			}
+		</style>
 		
 		<core-ajax
 			 id="ajax"
@@ -53,71 +53,71 @@
 		</core-header-panel>
   </template>
 	<script>
-    Polymer({
-		//  width="{{model[2]}}" height="{{model[3]}}"
-		  ready: function() {
-		    if (this.chapterId) {
-		      this.chapterIdChanged("", this.chapterId);
-		    }
-
-		    this.medianImageWidth = 256; // Some "reasonable" default.
-		    this.medianImageHeight = 1024; // Some "reasonable" default.
-		    this.listWidth = 360; // Some "reasonable" default.
-		  },
-		  domReady: function() {
-		    this.listWidth = Math.max(360, this.$.list.clientWidth);
-
-		    var self = this;
-		    window.addResizeListener(this.$.list, function() {
-		        self.listWidth = Math.max(1, self.$.list.clientWidth);
-		      });
-		  },
-		  chapterIdChanged: function (oldValue, newValue) {
-		    console.log(newValue);
-		    this.$.list.data = [];
-		    this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/chapter/" + newValue + "/";
-		    this.$.ajax.go();
-  		},
-		  ascendingImageData: function (a, b) {
-		    return a[0] - b[0];
-		  },
-		  ascendingImageWidth: function (a, b) {
-		    return a[2] - b[2];
-		  },
-		  ascendingImageHeight: function (a, b) {
-		    return a[3] - b[3];
-		  },
-		  handleResponse: function (event, detail, sender) {
-		    var images = detail.response.images;
-
-		    if (!images || images.length == 0) {
-		      this.$.list.data = [];
-		      return;
-		    }
-
-        images.sort(this.ascendingImageWidth);
-        this.medianImageWidth = Math.max(256, images[Math.floor(images.length/2)][2]);
-		    console.log("Median width updated to " + this.medianImageWidth);
-
-        images.sort(this.ascendingImageHeight);
-        this.medianImageHeight = Math.max(1024, images[Math.floor(images.length/2)][3]);
-		    console.log("Median height updated to " + this.medianImageHeight);
-
-		    images.sort(this.ascendingImageData);
-
-		    this.$.list.data = images;
-		    this.$.list.scrollToItem(0);
-		    // TODO: Adjust list.height to be the average height of the new data.
-		  },
-		  backClicked: function () {
-		    this.$.list.data = [];
-		    document.querySelector("app-router").go(
-		      "/" + escape(this.mangaId) + "/" + escape(this.mangaTitle));
-		    this.fire("back", {});
-		  },
-		  dateFromEpoch: function (seconds) {
-		    return (new Date(seconds * 1000)).toLocaleDateString();
-		  }
-    });
+		Polymer({
+				//  width="{{model[2]}}" height="{{model[3]}}"
+				ready: function() {
+						if (this.chapterId) {
+								this.chapterIdChanged("", this.chapterId);
+						}
+						
+						this.medianImageWidth = 256; // Some "reasonable" default.
+						this.medianImageHeight = 1024; // Some "reasonable" default.
+						this.listWidth = 360; // Some "reasonable" default.
+				},
+				domReady: function() {
+						this.listWidth = Math.max(360, this.$.list.clientWidth);
+						
+						var self = this;
+						window.addResizeListener(this.$.list, function() {
+								self.listWidth = Math.max(1, self.$.list.clientWidth);
+						});
+				},
+				chapterIdChanged: function (oldValue, newValue) {
+						console.log(newValue);
+						this.$.list.data = [];
+						this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/chapter/" + newValue + "/";
+						this.$.ajax.go();
+				},
+				ascendingImageData: function (a, b) {
+						return a[0] - b[0];
+				},
+				ascendingImageWidth: function (a, b) {
+						return a[2] - b[2];
+				},
+				ascendingImageHeight: function (a, b) {
+						return a[3] - b[3];
+				},
+				handleResponse: function (event, detail, sender) {
+						var images = detail.response.images;
+						
+						if (!images || images.length == 0) {
+								this.$.list.data = [];
+								return;
+						}
+						
+						images.sort(this.ascendingImageWidth);
+						this.medianImageWidth = Math.max(256, images[Math.floor(images.length/2)][2]);
+						console.log("Median width updated to " + this.medianImageWidth);
+						
+						images.sort(this.ascendingImageHeight);
+						this.medianImageHeight = Math.max(1024, images[Math.floor(images.length/2)][3]);
+						console.log("Median height updated to " + this.medianImageHeight);
+						
+						images.sort(this.ascendingImageData);
+						
+						this.$.list.data = images;
+						this.$.list.scrollToItem(0);
+						// TODO: Adjust list.height to be the average height of the new data.
+				},
+				backClicked: function () {
+						this.$.list.data = [];
+						document.querySelector("app-router").go(
+								"/" + escape(this.mangaId) + "/" + escape(this.mangaTitle));
+						this.fire("back", {});
+				},
+				dateFromEpoch: function (seconds) {
+						return (new Date(seconds * 1000)).toLocaleDateString();
+				}
+		});
 	</script>
 </polymer-element>

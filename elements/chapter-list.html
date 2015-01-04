@@ -8,41 +8,41 @@
 <polymer-element name="chapter-list" attributes="mangaId mangaTitle">
   <template>
 		<style>
-     .card {
-			 margin: 0;
-			 padding: 20px;
-		   width: 320px;
-		   height: 180px;
-		   border-radius: 2px;
-     }
-
-		 .card > paper-shadow {
-		   padding: 10px;
-		   width: 100%;
-		   height: 100%;
-		   background-color: #FFF;
-		 }
-
-		 .title {
-		   font-size: 24px;
-		 }
-
-		 .chapterNumber {
-		 }
-
-		 .date {
-		   text-align: right;
-		 }
-
-		 core-toolbar {
-		   background-color: #4CAF50;
-		   color: #FFF;
-		 }
-
-		 core-list {
-		   background-color: #EEE;
-		 }
-    </style>
+			.card {
+					margin: 0;
+					padding: 20px;
+					width: 320px;
+					height: 180px;
+					border-radius: 2px;
+			}
+			
+			.card > paper-shadow {
+					padding: 10px;
+					width: 100%;
+					height: 100%;
+					background-color: #FFF;
+			}
+			
+			.title {
+					font-size: 24px;
+			}
+			
+			.chapterNumber {
+			}
+			
+			.date {
+					text-align: right;
+			}
+			
+			core-toolbar {
+					background-color: #4CAF50;
+					color: #FFF;
+			}
+			
+			core-list {
+					background-color: #EEE;
+			}
+		</style>
 		
 		<core-ajax
 			 id="ajax"
@@ -78,53 +78,53 @@
   </template>
 	<script>
 		(function() {
-		  var chapterList_ = [];
-		  var mangaId_ = "some filler value";
-      Polymer({
-		    domReady: function() {
-		      if (this.mangaId == mangaId_) {
-		        this.$.list.data = chapterList_;
-		      }
-		    },
-		    convertToExpectedModel: function (model) {
-		      return {
-		        id: model[3],
-		        title: model[2],
-		        number: model[0],
-		        date: model[1]
-		      };
-		    },
-		    mangaIdChanged: function (oldValue, newValue) {
-		      if (mangaId_ == newValue) {
-		        return;
-		      }
-
-		      console.log(newValue);
-
-		      // Clear the chapterList_ if it isn't the same.
-		      this.$.list.data = [];
-		      chapterList_ = [];
-
-		      this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + newValue + "/";
-		      this.$.ajax.go();
-  		  },
-		    chapterListResponseChanged: function (oldValue, newValue) {
-		      chapterList_ = newValue.chapters.map(this.convertToExpectedModel);
-		      mangaId_ = this.mangaId;
-		      this.$.list.data = chapterList_;
-  		  },
-  		  selectChapter: function (event, detail, sender) {
-		      console.log(detail);
-		      document.querySelector("app-router").go(
-		        "/" + [this.mangaId, this.mangaTitle, detail.data.id, detail.data.number, detail.data.title].map(escape).join("/"));
-        },
-		    backClicked: function () {
-		      document.querySelector("app-router").go("/");
-		    },
-		    dateFromEpoch: function (seconds) {
-		      return (new Date(seconds * 1000)).toLocaleDateString(undefined, {year: "2-digit", month: "2-digit", day: "2-digit"});
-		    }
-      });
+				var chapterList_ = [];
+				var mangaId_ = "some filler value";
+				Polymer({
+						domReady: function() {
+								if (this.mangaId == mangaId_) {
+										this.$.list.data = chapterList_;
+								}
+						},
+						convertToExpectedModel: function (model) {
+								return {
+										id: model[3],
+										title: model[2],
+										number: model[0],
+										date: model[1]
+								};
+						},
+						mangaIdChanged: function (oldValue, newValue) {
+								if (mangaId_ == newValue) {
+										return;
+								}
+								
+								console.log(newValue);
+								
+								// Clear the chapterList_ if it isn't the same.
+								this.$.list.data = [];
+								chapterList_ = [];
+								
+								this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + newValue + "/";
+								this.$.ajax.go();
+						},
+						chapterListResponseChanged: function (oldValue, newValue) {
+								chapterList_ = newValue.chapters.map(this.convertToExpectedModel);
+								mangaId_ = this.mangaId;
+								this.$.list.data = chapterList_;
+						},
+						selectChapter: function (event, detail, sender) {
+								console.log(detail);
+								document.querySelector("app-router").go(
+										"/" + [this.mangaId, this.mangaTitle, detail.data.id, detail.data.number, detail.data.title].map(escape).join("/"));
+						},
+						backClicked: function () {
+								document.querySelector("app-router").go("/");
+						},
+						dateFromEpoch: function (seconds) {
+								return (new Date(seconds * 1000)).toLocaleDateString(undefined, {year: "2-digit", month: "2-digit", day: "2-digit"});
+						}
+				});
 		})();
 	</script>
 </polymer-element>
