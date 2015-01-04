@@ -2,7 +2,7 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
 
-<polymer-element name="manga-app-data">
+<polymer-element name="manga-app-data" attribute="loading">
   <template>
 		<core-ajax id="ajax" handleAs="json"></core-ajax>
 		<!-- Consider switching to polymer-localforage -->
@@ -14,6 +14,9 @@
 	<script>
 		(function() {
       Polymer({
+		    loading: true,
+		    ready: function () {
+		    },
       });
 		})();
 	</script>
