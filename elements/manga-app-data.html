@@ -14,11 +14,98 @@
   </template>
 	<script>
 		(function() {
-      Polymer({
-		    loading: true,
-		    ready: function () {
-		    },
-      });
+				var initialized_ = false;
+				var manga_ = {};
+				
+				var nextInstanceId_ = 0;
+				var instanceMap_ = new WeakMap();
+				var addInstance_ = function (instance) {
+						for (var i = 0; i < nextInstanceId_; i++) {
+								if (!instanceMap_.has(i)) {
+										instanceMap_.set(i, instance);
+										return;
+								}
+						}
+						instanceMap_.set(nextInstanceId_++, instance);;
+				}
+				var notifyInstances_ = function (event, msg) {
+						for (var i = 0; i < nextInstanceId_; i++) {
+								if (instanceMap_.has(i)) {
+										instanceMap_.get(i).fire(event, msg);
+								}
+						}
+				}
+
+				var updateManga_ = function (manga) {
+						// manga.map(this.convertToExpectedMangaModel);
+						manga.forEach(function (model) {
+								if (model.id in manga_) {
+										var original = manga_[model.id];
+										var updated = false;
+										for (key in model) {
+												if (original[key] != model[key]) {
+														original[key] = model[key];
+														updated = true;
+												}
+										}
+										if (updated) {
+												notifyInstances_("now-manga", model.id);
+										}
+								} else {
+										manga_[model.id] = model;
+										notifyInstances_("now-manga", model);
+								}
+						});
+						
+						// Finish initialization.
+						if (!initialized_) {
+								initialized_ = true;
+								for (var i = 0; i < nextInstanceId_; i++) {
+										if (instanceMap_.has(i)) {
+												instanceMap_.get(i).loading = false;
+										}
+								}
+						}
+				}
+
+				Polymer({
+						loading: !initialized_,
+						ready: function () {
+								if (!initialized_) {
+										this.refreshManga();
+								}
+						},
+						refreshManga: function() {
+								this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/list/0/";
+								this.$.ajax.onCoreResponse = this.updateManga;
+								this.$.ajax.go();
+						},
+						convertToExpectedMangaModel: function (model) {
+								return {
+										title: model.t,
+										id: model.i,
+										image: model.im ? "https://cdn.mangaeden.com/mangasimg/" + model.im : undefined,
+										latestChapterDate: model.ld
+								};
+						},
+						ascendingTitle: function (a,b) {
+								if (a.title < b.title) {
+										return 1;
+								} else if (a.title > b.title) {
+										return -1;
+								} else {
+										return 0;
+								}
+						},
+						getManga: function() {
+								var result = [];
+								for (var key in manga_) {
+										result.push(manga_[key]);
+								}
+								result.sort(this.ascendingTitle);
+								return result;
+						},
+				});
 		})();
 	</script>
 </polymer-element>
