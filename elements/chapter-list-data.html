@@ -1,0 +1,61 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
+
+<polymer-element name="chapter-list-data" attribute="mangaId">
+  <template>
+		<core-ajax 
+			 id="ajax"
+			 handleAs="json"
+			 on-core-response="{{handleResponse}}"></core-ajax>
+		<!-- Consider switching to polymer-localforage -->
+		<!--
+		<core-localstorage name="mangaAppData" value="{{value}}"></core-localstorage>
+		-->
+
+  </template>
+	<script>
+		(function() {
+				var initialized_ = false;
+				var chapterList_ = [];
+				var mangaId_ = "something";
+
+				Polymer({
+						loading: !initialized_,
+						mangaIdChanged: function(oldValue, newValue) {
+								if (!this.mangaId) {
+										return;
+								}
+
+								if (mangaId_ != this.mangaId) {
+										initialized_ = false;
+										chapterList_ = [];
+								}
+
+								if (initialized_) {
+										this.chapterListLoaded_();
+								} else {
+										this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/chapter/" + this.mangaId + "/";
+										this.$.ajax.go();
+								}
+						},
+						convertToExpectedModel: function (model) {
+								return {
+										id: model[3],
+										title: model[2],
+										number: model[0],
+										date: model[1]
+								};
+						},
+						handleResponse: function (event, detail, sender) {
+								mangaId_ = this.mangaId;
+								chapterList_ = detail.chapters.map(this.convertToExpectedModel);
+								this.chapterListLoaded_();
+						},
+						chapterListLoaded_: function() {
+								this.fire("chapter-list-loaded", chapterList_);
+						},
+				});
+		})();
+	</script>
+</polymer-element>

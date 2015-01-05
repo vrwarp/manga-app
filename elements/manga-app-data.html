@@ -136,7 +136,7 @@
 
 				Polymer({
 						loading: !initialized_,
-						ready: function() {
+						domReady: function() {
 								addInstance_(this);
 								if (initialized_) {
 										this.mangaListLoaded_();
