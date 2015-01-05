@@ -18,26 +18,82 @@
 				var manga_ = {};
 				
 				var nextInstanceId_ = 0;
+				var instanceKeys_ = [];
 				var instanceMap_ = new WeakMap();
 				var addInstance_ = function (instance) {
-						for (var i = 0; i < nextInstanceId_; i++) {
-								if (!instanceMap_.has(i)) {
-										instanceMap_.set(i, instance);
+						for (var i = 0; i < instanceKeys_.length; i++) {
+								if (!instanceMap_.has(instanceKeys_[i])) {
+										instanceMap_.set(instanceKeys_[i], instance);
 										return;
 								}
 						}
-						instanceMap_.set(nextInstanceId_++, instance);;
+						var key = {id: nextInstanceId_++};
+						instanceKeys_.push(key);
+						instanceMap_.set(key, instance);;
 				}
 				var notifyInstances_ = function (event, msg) {
-						for (var i = 0; i < nextInstanceId_; i++) {
-								if (instanceMap_.has(i)) {
-										instanceMap_.get(i).fire(event, msg);
+						for (var i = 0; i < instanceKeys_.length; i++) {
+								var key = instanceKeys_[i];
+								if (instanceMap_.has(key)) {
+										instanceMap_.get(key).fire(event, msg);
 								}
 						}
 				}
 
+				var getUrl_ = function (url) {
+						// Return a new promise.
+						return new Promise(function(resolve, reject) {
+								// Do the usual XHR stuff
+								var req = new XMLHttpRequest();
+								req.open('GET', url);
+								
+								req.onload = function() {
+										// This is called even on 404 etc
+										// so check the status
+										if (req.status == 200) {
+												// Resolve the promise with the response text
+												resolve(req.response);
+										}
+										else {
+												// Otherwise reject with the status text
+												// which will hopefully be a meaningful error
+												reject(Error(req.statusText));
+										}
+								};
+								
+								// Handle network errors
+								req.onerror = function() {
+										reject(Error("Network Error"));
+								};
+								
+								// Make the request
+								req.send();
+						});
+				}
+
+				var getJsonUrl_ = function (url) {
+						return getUrl_(url).then(function (response) {
+								try {
+										return JSON.parse(response);
+								} catch (x) {
+										console.warn('getJsonUrl_ caught an exception trying to parse response as JSON:');
+										console.warn('url:', url);
+										console.warn(x);
+										return Promise.reject(x);
+								}
+						});
+				}
+
+				var convertToExpectedMangaModel_ = function (model) {
+						return {
+								title: model.t,
+								id: model.i,
+								image: model.im ? "https://cdn.mangaeden.com/mangasimg/" + model.im : undefined,
+								latestChapterDate: model.ld
+						};
+				}
+
 				var updateManga_ = function (manga) {
-						// manga.map(this.convertToExpectedMangaModel);
 						manga.forEach(function (model) {
 								if (model.id in manga_) {
 										var original = manga_[model.id];
@@ -49,55 +105,56 @@
 												}
 										}
 										if (updated) {
-												notifyInstances_("now-manga", model.id);
+												notifyInstances_("update-manga", model.id);
 										}
 								} else {
 										manga_[model.id] = model;
-										notifyInstances_("now-manga", model);
+										notifyInstances_("new-manga", model);
 								}
 						});
-						
-						// Finish initialization.
-						if (!initialized_) {
-								initialized_ = true;
-								for (var i = 0; i < nextInstanceId_; i++) {
-										if (instanceMap_.has(i)) {
-												instanceMap_.get(i).loading = false;
-										}
+				}
+
+				var refreshManga_ = function() {
+						return getJsonUrl_("https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/list/0/").then(
+								function (data) {
+										updateManga_(data.manga.map(convertToExpectedMangaModel_));
+								});
+				}
+
+				// initial refresh.
+				refreshManga_().then(function () {
+						initialized_ = true;
+						for (var i = 0; i < instanceKeys_.length; i++) {
+								var key = instanceKeys_[i];
+								if (instanceMap_.has(key)) {
+										var instance = instanceMap_.get(key);
+										instance.loading = false;
+										instance.mangaListLoaded_();
 								}
 						}
-				}
+				});
 
 				Polymer({
 						loading: !initialized_,
-						ready: function () {
-								if (!initialized_) {
-										this.refreshManga();
+						ready: function() {
+								addInstance_(this);
+								if (initialized_) {
+										this.mangaListLoaded_();
 								}
 						},
-						refreshManga: function() {
-								this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/list/0/";
-								this.$.ajax.onCoreResponse = this.updateManga;
-								this.$.ajax.go();
-						},
-						convertToExpectedMangaModel: function (model) {
-								return {
-										title: model.t,
-										id: model.i,
-										image: model.im ? "https://cdn.mangaeden.com/mangasimg/" + model.im : undefined,
-										latestChapterDate: model.ld
-								};
+						mangaListLoaded_: function() {
+								this.fire("manga-list-loaded", this.getMangaList());
 						},
 						ascendingTitle: function (a,b) {
 								if (a.title < b.title) {
-										return 1;
-								} else if (a.title > b.title) {
 										return -1;
+								} else if (a.title > b.title) {
+										return 1;
 								} else {
 										return 0;
 								}
 						},
-						getManga: function() {
+						getMangaList: function() {
 								var result = [];
 								for (var key in manga_) {
 										result.push(manga_[key]);
