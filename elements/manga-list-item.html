@@ -5,25 +5,29 @@
 <polymer-element name="manga-list-item" attributes="manga" noscript>
   <template>
 		<style>
+			.card {
+					padding: 8px;
+			}
+
 			.mangaTitle {
-			  height: 20px;
-			  margin: 10px;
-			  white-space: nowrap;
-			  overflow: hidden;
-			  text-overflow: ellipsis;
+					height: 20px;
+					margin: 10px;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
 			}
-
+			
 			.fill {
-			  height: 100%;
+					height: 100%;
 			}
-
+			
 			paper-shadow {
-			  background-color: #FFF;
+					background-color: #FFF;
 			};
     </style>
 
-		<div fit style="padding: 10px">
-			<paper-shadow z="2" vertical layout style="width:100%;height:100%">
+		<div class="card"  fit>
+			<paper-shadow z="1" vertical layout style="width:100%;height:100%">
 				<core-image
 					 flex
 					 src="{{manga.image}}"

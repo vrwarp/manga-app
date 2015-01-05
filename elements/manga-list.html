@@ -15,7 +15,6 @@
 					height: 450px;
 					width: 300px;
 					margin: 0;
-					padding: 10px;
 					border-radius: 2px;
 			}
 			
@@ -103,9 +102,7 @@
 				 grid
 				 on-core-activate="{{selectManga}}">
 				<template>
-					<div class="card">
-						<manga-list-item manga="{{model}}"></manga-list-item>
-					</div>
+					<manga-list-item class="card" manga="{{model}}"></manga-list-item>
 				</template>
 			</core-list>
 		</core-header-panel>

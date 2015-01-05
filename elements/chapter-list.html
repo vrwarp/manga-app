@@ -10,7 +10,7 @@
 		<style>
 			.card {
 					margin: 0;
-					padding: 20px;
+					padding: 16px;
 					width: 320px;
 					height: 180px;
 					border-radius: 2px;
@@ -41,6 +41,7 @@
 			
 			core-list {
 					background-color: #EEE;
+					padding: 8px;
 			}
 		</style>
 		
@@ -65,7 +66,7 @@
 				 on-core-activate="{{selectChapter}}">
 				<template>
 					<div class="card">
-						<paper-shadow z="2" vertical layout>
+						<paper-shadow z="1" vertical layout>
 							<div class="title">{{model.title}}</div>
 							<div class="chapterNumber">Chapter {{model.number}}</div>
 							<div flex></div>
