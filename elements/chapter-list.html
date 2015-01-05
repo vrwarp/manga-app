@@ -46,11 +46,9 @@
 			}
 		</style>
 		
-		<chapter-list-data mangaId="{{mangaId}}"></chapter-list-data>
-		<core-ajax
-			 id="ajax"
-			 handleAs="json"
-			 response="{{chapterListResponse}}"></core-ajax>
+		<chapter-list-data
+			 mangaId="{{mangaId}}"
+			 on-chapter-list-loaded="{{chapterListLoaded}}"></chapter-list-data>
 
 		<core-header-panel mode="seamed" fit>
 			<core-toolbar>
@@ -85,41 +83,7 @@
   </template>
 	<script>
 		(function() {
-				var chapterList_ = [];
-				var mangaId_ = "some filler value";
 				Polymer({
-						domReady: function() {
-								if (this.mangaId == mangaId_) {
-										this.$.list.data = chapterList_;
-								}
-						},
-						convertToExpectedModel: function (model) {
-								return {
-										id: model[3],
-										title: model[2],
-										number: model[0],
-										date: model[1]
-								};
-						},
-						mangaIdChanged: function (oldValue, newValue) {
-								if (mangaId_ == newValue) {
-										return;
-								}
-								
-								console.log(newValue);
-								
-								// Clear the chapterList_ if it isn't the same.
-								this.$.list.data = [];
-								chapterList_ = [];
-								
-								this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + newValue + "/";
-								this.$.ajax.go();
-						},
-						chapterListResponseChanged: function (oldValue, newValue) {
-								chapterList_ = newValue.chapters.map(this.convertToExpectedModel);
-								mangaId_ = this.mangaId;
-								this.$.list.data = chapterList_;
-						},
 						selectChapter: function (event, detail, sender) {
 								console.log(detail);
 								document.querySelector("app-router").go(
@@ -130,6 +94,9 @@
 						},
 						dateFromEpoch: function (seconds) {
 								return (new Date(seconds * 1000)).toLocaleDateString(undefined, {year: "2-digit", month: "2-digit", day: "2-digit"});
+						},
+						chapterListLoaded: function (event, detail, sender) {
+								this.$.list.data = detail;
 						}
 				});
 		})();

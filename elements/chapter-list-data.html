@@ -2,7 +2,7 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
 
-<polymer-element name="chapter-list-data" attribute="mangaId">
+<polymer-element name="chapter-list-data" attributes="mangaId">
   <template>
 		<core-ajax 
 			 id="ajax"
@@ -35,7 +35,7 @@
 								if (initialized_) {
 										this.chapterListLoaded_();
 								} else {
-										this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/chapter/" + this.mangaId + "/";
+										this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + this.mangaId + "/";
 										this.$.ajax.go();
 								}
 						},
@@ -49,7 +49,8 @@
 						},
 						handleResponse: function (event, detail, sender) {
 								mangaId_ = this.mangaId;
-								chapterList_ = detail.chapters.map(this.convertToExpectedModel);
+								chapterList_ = detail.response.chapters.map(this.convertToExpectedModel);
+								initialized_ = true;
 								this.chapterListLoaded_();
 						},
 						chapterListLoaded_: function() {
