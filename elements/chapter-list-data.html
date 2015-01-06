@@ -1,9 +1,11 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
+<link rel="import" href="manga-app-data.html">
 
 <polymer-element name="chapter-list-data" attributes="mangaId">
   <template>
+		<manga-app-data id="appData"></manga-app-data>
 		<core-ajax 
 			 id="ajax"
 			 handleAs="json"
@@ -22,19 +24,17 @@
 
 				Polymer({
 						loading: !initialized_,
+						domReady: function() {
+								if (mangaId_ == this.mangaId && initialized_) {
+										this.chapterListLoaded_();
+								}
+						},
 						mangaIdChanged: function(oldValue, newValue) {
 								if (!this.mangaId) {
 										return;
 								}
 
 								if (mangaId_ != this.mangaId) {
-										initialized_ = false;
-										chapterList_ = [];
-								}
-
-								if (initialized_) {
-										this.chapterListLoaded_();
-								} else {
 										this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + this.mangaId + "/";
 										this.$.ajax.go();
 								}
