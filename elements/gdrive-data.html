@@ -1,0 +1,130 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<script type="application/javascript" src="../lib/task.js"></script>
+<script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+
+<polymer-element name="gdrive-data" attributes="loggedIn profileName profileImage">
+  <template>
+
+  </template>
+	<script>
+		(function() {
+				var nextInstanceId_ = 0;
+				var instanceKeys_ = [];
+				var instanceMap_ = new WeakMap();
+				var addInstance_ = function (instance) {
+						for (var i = 0; i < instanceKeys_.length; i++) {
+								if (!instanceMap_.has(instanceKeys_[i])) {
+										instanceMap_.set(instanceKeys_[i], instance);
+										return;
+								}
+						}
+						var key = {id: nextInstanceId_++};
+						instanceKeys_.push(key);
+						instanceMap_.set(key, instance);;
+				}
+				var notifyInstances_ = function (event, msg) {
+						for (var i = 0; i < instanceKeys_.length; i++) {
+								var key = instanceKeys_[i];
+								if (instanceMap_.has(key)) {
+										instanceMap_.get(key).fire(event, msg);
+								}
+						}
+				}
+
+				var initialized_ = false;
+				var model_ = null;
+				var authenticated_ = false;
+				var profileName_ = null;
+				var profileImage_ = null;
+				
+				var CLIENT_ID = '423468108258-2i6sdlvnc644qd0nkphhiae2trvaeusb.apps.googleusercontent.com';
+				var SCOPES = [
+						'https://www.googleapis.com/auth/drive.file',
+						'https://www.googleapis.com/auth/plus.me',
+				];
+
+				var checkAuth_ = function() {
+						gapi.auth.authorize(
+								{
+										client_id: CLIENT_ID,
+										scope: SCOPES,
+										immediate: true
+								},
+								handleAuthResult_);
+				}
+
+				var handleAuthResult_ = function(authResult) {
+						Promise.resolve().then(function() {
+								if (!authResult) {
+										return Promise.reject("unknown");
+								} else if (authResult.error) {
+										return Promise.reject(authResult.error);
+								} else {
+										return gapi.client.plus.people.get({
+												'userId' : 'me'
+										}).then(function(resp) {
+												profileName_ = resp.result.displayName;
+												profileImage_ = resp.result.image.url;
+										});
+								}
+						}).then(function () {
+								authenticated_ = true;
+						}, function(reason) {
+								console.log("Auth failed with " + reason);
+								authenticated_ = false;
+						}).then(function() {
+								for (var i = 0; i < instanceKeys_.length; i++) {
+										var key = instanceKeys_[i];
+										if (instanceMap_.has(key)) {
+												instanceMap_.get(key).authenticatedChanged_();
+										}
+								}
+						});
+				}
+
+				var domReady_ = false;
+				var gapiReady_ = false;
+				var gapiReadyHandler_ = function() {
+						gapi.client.load('plus', 'v1').then(function() {
+								gapiReady_ = true;
+								if (domReady_) {
+										checkAuth_();
+								}
+						});
+				}
+
+				gapi.load("auth:client,drive-realtime", gapiReadyHandler_);
+
+				Polymer({
+						domReady: function() {
+								addInstance_(this);
+								if (initialized_) {
+										// this.mangaListLoaded_();
+								}
+
+								domReady_ = true;
+								if (gapiReady_) {
+										checkAuth_();
+								}
+						},
+						loggedIn: false,
+						profileName: "",
+						profileImage: "",
+						authenticatedChanged_: function() {
+								this.profileName = profileName_;
+								this.profileImage = profileImage_;
+								this.loggedIn = authenticated_;
+						},
+						authenticate: function() {
+								gapi.auth.authorize(
+										{
+												client_id: CLIENT_ID,
+												scope: SCOPES,
+												immediate: false
+										},
+										handleAuthResult_);
+						},
+				});
+		})();
+	</script>
+</polymer-element>

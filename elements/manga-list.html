@@ -5,6 +5,7 @@
 <link rel="import" href="../bower_components/core-a11y-keys/core-a11y-keys.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="gdrive-data.html">
 <link rel="import" href="manga-app-data.html">
 <link rel="import" href="manga-list-item.html">
 
@@ -54,10 +55,13 @@
 					background-color: #C8E6C9;
 			}
 		</style>
+
+		<gdrive-data
+			 id="appData"
+			 loggedIn="{{loggedIn}}"
+			 profileImage="{{profileImage}}"></gdrive-data>
 		
 		<manga-app-data
-			 id="appData"
-			 loading="{{appDataLoading}}"
 			 on-manga-list-loaded="{{mangaListLoaded}}"></manga-app-data>
 
 		<core-header-panel mode="seamed" fit>
@@ -65,7 +69,7 @@
 				<core-animated-pages
 					 id="toolbarPages"
 					 transitions="hero-transition cross-fade"
-					 fit>
+					 flex>
 					<section horizontal layout center>
 						<div class="bottom indent" cross-fade>Manga App</div>
 						<div flex></div>
@@ -91,6 +95,15 @@
 						</paper-input>
 					</section>
 				</core-animated-pages>
+
+				<template if="{{loggedIn}}">
+					<div style="width:40px;height:40px;border-radius:20px;background: url({{profileImage}}) no-repeat;"></div>
+				</template>
+				<template if="{{!loggedIn}}">
+					<paper-icon-button
+						 icon="account-circle"
+						 on-click="{{authenticate}}"></paper-icon-button>
+				</template>
 			</core-toolbar>
 
 			<core-list
@@ -173,7 +186,10 @@
 						mangaListLoaded: function (event, detail, sender) {
 								mangaList_ = detail;
 								this.searchFilterChanged("", this.$.searchInput.value);
-						}
+						},
+						authenticate: function() {
+								this.$.appData.authenticate();
+						},
 				});
 		})();
 	</script>
