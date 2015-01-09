@@ -33,13 +33,15 @@
 
 				var initialized_ = false;
 				var model_ = null;
+				var starredList_ = null;
+				var readMap_ = null;
 				var authenticated_ = false;
 				var profileName_ = null;
 				var profileImage_ = null;
 				
 				var CLIENT_ID = '423468108258-2i6sdlvnc644qd0nkphhiae2trvaeusb.apps.googleusercontent.com';
 				var SCOPES = [
-						'https://www.googleapis.com/auth/drive.file',
+						'https://www.googleapis.com/auth/drive.appfolder',
 						'https://www.googleapis.com/auth/plus.me',
 				];
 
@@ -60,6 +62,7 @@
 								} else if (authResult.error) {
 										return Promise.reject(authResult.error);
 								} else {
+										loadModel_();
 										return gapi.client.plus.people.get({
 												'userId' : 'me'
 										}).then(function(resp) {
@@ -82,15 +85,65 @@
 						});
 				}
 
+				var initializeModel_ = function(model) {
+						var root = model.getRoot();
+						root.set("starred", model.createList());
+						root.set("read", model.createMap());
+						root.set("version", 1);
+				}
+
+				var modelLoaded_ = function(doc) {
+						model_ = doc.getModel();
+						var root = model_.getRoot();
+						starredList_ = root.get("starred");
+						readMap_ = root.get("read");
+						initialized_ = true;
+				}
+				
+				var modelLoadingFailed_ = function(e) {
+						if(e.type == gapi.drive.realtime.ErrorType.TOKEN_REFRESH_REQUIRED) {
+								checkAuth_();
+						} else if(e.type == gapi.drive.realtime.ErrorType.CLIENT_ERROR) {
+								console.error("ERROR: Error loading model: " + e.message);
+						} else if(e.type == gapi.drive.realtime.ErrorType.NOT_FOUND) {
+								console.error("ERROR: Error loading model: NOT FOUND");
+						}
+				};
+
+				var loadModel_ = function() {
+						return gapi.client.drive.files.list({
+								"q": "'appfolder' in parents and title='config'"
+						}).then(function(resp) {
+								if (resp.result.items.length == 0) {
+										console.log("INFO: creating initial config");
+										return gapi.client.drive.files.insert({
+												'resource': {
+														mimeType: "application/com.vrwarp.manga-app.config",
+														title: "config"
+												}
+										}).then(function (resp) {
+												return resp.result;
+										});
+								} else if (resp.result.items.length > 1) {
+										console.log("WARNING: more than one config found");
+								}
+								return resp.result.items[0];
+						}).then(function(file) {
+								gapi.drive.realtime.load(file.id, modelLoaded_, initializeModel_, modelLoadingFailed_);
+						});
+				}
+
 				var domReady_ = false;
 				var gapiReady_ = false;
 				var gapiReadyHandler_ = function() {
-						gapi.client.load('plus', 'v1').then(function() {
-								gapiReady_ = true;
-								if (domReady_) {
-										checkAuth_();
-								}
-						});
+						Promise.all([gapi.client.load('plus', 'v1'),
+												 gapi.client.load('drive', 'v2')])
+								.then(function() {
+										gapiReady_ = true;
+										if (domReady_) {
+												checkAuth_();
+										}
+								});
 				}
 
 				gapi.load("auth:client,drive-realtime", gapiReadyHandler_);
