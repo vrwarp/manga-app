@@ -119,7 +119,8 @@
 										return gapi.client.drive.files.insert({
 												'resource': {
 														mimeType: "application/com.vrwarp.manga-app.config",
-														title: "config"
+														title: "config",
+														parents: [{'id': 'appfolder'}],
 												}
 										}).then(function (resp) {
 												return resp.result;
