@@ -3,7 +3,9 @@
 <link rel="import" href="../bower_components/core-list/core-list.html">
 <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="resize-listener.html">
+<link rel="import" href="chapter-list-data.html">
 
 <polymer-element name="chapter-view" attributes="mangaId mangaTitle chapterId chapterNumber chapterTitle">
   <template>
@@ -11,6 +13,19 @@
 			.page img {
 					margin: 0 auto;
 					display: block;
+			}
+
+			.page div {
+					margin: 8px 8px;
+			}
+
+			.page paper-button {
+					margin: 0 auto;
+					width: {{medianImageWidth}}px;
+					max-width: 100%;
+					display: block;
+					padding: 8px;
+					text-align: center;
 			}
 			
 			.page {
@@ -27,10 +42,16 @@
 			}
 		</style>
 		
+		<chapter-list-data
+			 id="chapterListData"
+			 mangaId="{{mangaId}}"
+			 on-chapter-list-loaded="{{chapterListLoaded}}"></chapter-list-data>
+
 		<core-ajax
 			 id="ajax"
 			 handleAs="json"
 			 on-core-response="{{handleResponse}}"></core-ajax>
+
 		<core-header-panel fit>
 			<core-toolbar>
         <paper-icon-button icon="arrow-back" on-click="{{backClicked}}"></paper-icon-button>
@@ -44,9 +65,18 @@
 				 height="{{medianImageHeight * ((listWidth > medianImageWidth ? medianImageWidth : listWidth) / medianImageWidth)}}">
 				<template>
 					<div class="page" >
-						<img src="https://cdn.mangaeden.com/mangasimg/{{model[1]}}"
-								 width="{{listWidth > model[2] ? model[2] : listWidth}}"
-								 height="{{model[3] * ((listWidth > model[2] ? model[2] : listWidth) / model[2])}}">
+						<template if="{{model.image}}">
+							<img src="{{model.image.url}}"
+									 width="{{listWidth > model.image.width ? model.image.width : listWidth}}"
+									 height="{{model.image.height * ((listWidth > model.image.width ? model.image.width : listWidth) / model.image.width)}}">
+						</template>
+						<template if="{{model.nextChapterButton}}">
+							<div>
+								<paper-button
+									 raised
+									 on-click="{{nextChapter}}">Next Chapter: {{nextChapterTitle}}</paper-button>
+							</div>
+						</template>
 					</div>
 				</template>
 			</core-list>
@@ -79,13 +109,23 @@
 						this.$.ajax.go();
 				},
 				ascendingImageData: function (a, b) {
-						return a[0] - b[0];
+						return a.image ? a.image.page - b.image.page : 1;
 				},
 				ascendingImageWidth: function (a, b) {
-						return a[2] - b[2];
+						return a.image ? a.image.width - b.image.width : 1;
 				},
 				ascendingImageHeight: function (a, b) {
-						return a[3] - b[3];
+						return a.image ? a.image.height - b.image.height : 1;
+				},
+				convertToExpectedModel: function (model) {
+						return {
+								image: {
+										page: model[0],
+										url: "https://cdn.mangaeden.com/mangasimg/" + model[1],
+										width: model[2],
+										height: model[3]
+								}
+						};
 				},
 				handleResponse: function (event, detail, sender) {
 						var images = detail.response.images;
@@ -94,20 +134,22 @@
 								this.$.list.data = [];
 								return;
 						}
+						images = images.map(this.convertToExpectedModel);
 						
 						images.sort(this.ascendingImageWidth);
-						this.medianImageWidth = Math.max(256, images[Math.floor(images.length/2)][2]);
+						this.medianImageWidth = Math.max(256, images[Math.floor(images.length/2)].image.width);
 						console.log("Median width updated to " + this.medianImageWidth);
 						
 						images.sort(this.ascendingImageHeight);
-						this.medianImageHeight = Math.max(1024, images[Math.floor(images.length/2)][3]);
+						this.medianImageHeight = Math.max(1024, images[Math.floor(images.length/2)].image.height);
 						console.log("Median height updated to " + this.medianImageHeight);
 						
 						images.sort(this.ascendingImageData);
 						
 						this.$.list.data = images;
 						this.$.list.scrollToItem(0);
-						// TODO: Adjust list.height to be the average height of the new data.
+
+						this.addNextChapterButton_();
 				},
 				backClicked: function () {
 						this.$.list.data = [];
@@ -117,7 +159,36 @@
 				},
 				dateFromEpoch: function (seconds) {
 						return (new Date(seconds * 1000)).toLocaleDateString();
-				}
+				},
+				nextChapterId: null,
+				nextChapterNumber: null,
+				nextChapterTitle: null,
+				chapterListLoaded: function (event, detail, sender) {
+						var index = 0;
+						for (index = 0; index < detail.length; index++) {
+								if (detail[index].id == this.chapterId) {
+										break;
+								}
+						}
+						if (index > 0) {
+								this.nextChapterId = detail[index-1].id;
+								this.nextChapterNumber = detail[index-1].number;
+								this.nextChapterTitle = detail[index-1].title;
+						}
+						this.addNextChapterButton_();
+				},
+				addNextChapterButton_: function() {
+						if (!this.nextChapterId) {
+								return;
+						}
+						this.$.list.data.push({
+								nextChapterButton: true
+						});
+				},
+				nextChapter: function() {
+						document.querySelector("app-router").go(
+								"/" + [this.mangaId, this.mangaTitle, this.nextChapterId, this.nextChapterNumber, this.nextChapterTitle].map(escape).join("/"));
+				},
 		});
 	</script>
 </polymer-element>
