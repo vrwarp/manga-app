@@ -213,6 +213,16 @@
 
 								return new Set(starredList_.asArray());
 						},
+						authenticate: function() {
+								// Authenticate with a pop-up.
+								gapi.auth.authorize(
+										{
+												client_id: CLIENT_ID,
+												scope: SCOPES,
+												immediate: false,
+										},
+										handleAuthResult_);
+						},
 				});
 		})();
 	</script>
