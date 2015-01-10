@@ -26,11 +26,13 @@
 
 				Polymer({
 						loading: !initialized_,
+						ready: function() {
+								this.updateStarred_();
+						},
 						domReady: function() {
 								if (mangaId_ == this.mangaId && initialized_) {
 										this.chapterListLoaded_();
 								}
-								this.updateStarred_();
 						},
 						mangaIdChanged: function(oldValue, newValue) {
 								if (!this.mangaId) {

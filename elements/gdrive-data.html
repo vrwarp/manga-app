@@ -154,7 +154,7 @@
 												 gapi.client.load('drive', 'v2')])
 								.then(function() {
 										gapiReady_ = true;
-										if (domReady_) {
+										if (domReady_ && !authenticated_) {
 												checkAuth_();
 										}
 								});
@@ -163,32 +163,27 @@
 				gapi.load("auth:client,drive-realtime", gapiReadyHandler_);
 
 				Polymer({
+						ready: function() {
+								this.modelReady = initialized_;
+								if (authenticated_) {
+										this.authenticatedChanged_();
+								}
+						},
 						domReady: function() {
 								addInstance_(this);
 								domReady_ = true;
-								if (authenticated_) {
-										this.authenticatedChanged_();
-								} else if (gapiReady_) {
+								if (gapiReady_ && !authenticated_) {
 										checkAuth_();
 								}
 						},
 						loggedIn: false,
-						modelReady: initialized_,
+						modelReady: false,
 						profileName: "",
 						profileImage: "",
 						authenticatedChanged_: function() {
 								this.profileName = profileName_;
 								this.profileImage = profileImage_;
 								this.loggedIn = authenticated_;
-						},
-						authenticate: function() {
-								gapi.auth.authorize(
-										{
-												client_id: CLIENT_ID,
-												scope: SCOPES,
-												immediate: false
-										},
-										handleAuthResult_);
 						},
 						isMangaStarred: function (chapterId) {
 								if (!initialized_) {
