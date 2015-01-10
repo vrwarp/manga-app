@@ -6,7 +6,7 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="gdrive-data.html">
-<link rel="import" href="manga-app-data.html">
+<link rel="import" href="manga-list-data.html">
 <link rel="import" href="manga-list-item.html">
 
 <polymer-element name="manga-list" attributes="searchFilter">
@@ -61,8 +61,8 @@
 			 loggedIn="{{loggedIn}}"
 			 profileImage="{{profileImage}}"></gdrive-data>
 		
-		<manga-app-data
-			 on-manga-list-loaded="{{mangaListLoaded}}"></manga-app-data>
+		<manga-list-data
+			 on-manga-list-loaded="{{mangaListLoaded}}"></manga-list-data>
 
 		<core-header-panel mode="seamed" fit>
 			<core-toolbar>
