@@ -47,7 +47,9 @@
 		</style>
 		
 		<chapter-list-data
+			 id="chapterListData"
 			 mangaId="{{mangaId}}"
+			 starred="{{starred}}"
 			 on-chapter-list-loaded="{{chapterListLoaded}}"></chapter-list-data>
 
 		<core-header-panel mode="seamed" fit>
@@ -56,8 +58,8 @@
 				<div>{{mangaTitle}}</div>
 				<div flex></div>
 				<paper-icon-button
-					 icon="star-outline"
-					 on-click=""></paper-icon-button>
+					 icon="{{starred?'star':'star-outline'}}"
+					 on-click="{{toggleStarred}}"></paper-icon-button>
 			</core-toolbar>
 
 			<core-list
@@ -97,7 +99,10 @@
 						},
 						chapterListLoaded: function (event, detail, sender) {
 								this.$.list.data = detail;
-						}
+						},
+						toggleStarred: function() {
+								this.$.chapterListData.toggleStarred();
+						},
 				});
 		})();
 	</script>

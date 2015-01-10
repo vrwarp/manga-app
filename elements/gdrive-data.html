@@ -2,7 +2,7 @@
 <script type="application/javascript" src="../lib/task.js"></script>
 <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
 
-<polymer-element name="gdrive-data" attributes="loggedIn profileName profileImage">
+<polymer-element name="gdrive-data" attributes="loggedIn profileName profileImage modelReady">
   <template>
 
   </template>
@@ -27,6 +27,14 @@
 								var key = instanceKeys_[i];
 								if (instanceMap_.has(key)) {
 										instanceMap_.get(key).fire(event, msg);
+								}
+						}
+				}
+				var updateModelReady_ = function () {
+						for (var i = 0; i < instanceKeys_.length; i++) {
+								var key = instanceKeys_[i];
+								if (instanceMap_.has(key)) {
+										instanceMap_.get(key).modelReady = initialized_;
 								}
 						}
 				}
@@ -98,6 +106,7 @@
 						starredList_ = root.get("starred");
 						readMap_ = root.get("read");
 						initialized_ = true;
+						updateModelReady_();
 				}
 				
 				var modelLoadingFailed_ = function(e) {
@@ -152,9 +161,7 @@
 				Polymer({
 						domReady: function() {
 								addInstance_(this);
-								if (initialized_) {
-										// this.mangaListLoaded_();
-								}
+								this.fire("initialized-changed", initialized_);
 
 								domReady_ = true;
 								if (gapiReady_) {
@@ -162,6 +169,7 @@
 								}
 						},
 						loggedIn: false,
+						modelReady: initialized_,
 						profileName: "",
 						profileImage: "",
 						authenticatedChanged_: function() {
@@ -177,6 +185,29 @@
 												immediate: false
 										},
 										handleAuthResult_);
+						},
+						isMangaStarred: function (chapterId) {
+								if (!initialized_) {
+										return false;
+								}
+
+								return starredList_.indexOf(chapterId) != -1;
+						},
+						setMangaStarred: function (chapterId, starred) {
+								if (starred) {
+										starredList_.push(chapterId);
+								} else {
+										model_.beginCompoundOperation("Remove " + chapterId);
+
+										var starredArray = starredList_.asArray()
+										starredList_.clear();
+										starredList_.pushAll(starredArray.filter(function (value) {
+												return value != chapterId;
+										}));
+
+										model_.endCompoundOperation();
+								}
+								return;
 						},
 				});
 		})();

@@ -3,9 +3,11 @@
 <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
 <link rel="import" href="gdrive-data.html">
 
-<polymer-element name="chapter-list-data" attributes="mangaId">
+<polymer-element name="chapter-list-data" attributes="mangaId starred">
   <template>
-		<gdrive-data id="appData"></gdrive-data>
+		<gdrive-data
+			 id="driveData"
+			 modelReady="{{driveModelReady}}"></gdrive-data>
 		<core-ajax 
 			 id="ajax"
 			 handleAs="json"
@@ -28,6 +30,7 @@
 								if (mangaId_ == this.mangaId && initialized_) {
 										this.chapterListLoaded_();
 								}
+								this.updateStarred();
 						},
 						mangaIdChanged: function(oldValue, newValue) {
 								if (!this.mangaId) {
@@ -37,6 +40,7 @@
 								if (mangaId_ != this.mangaId) {
 										this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + this.mangaId + "/";
 										this.$.ajax.go();
+										this.updateStarred();
 								}
 						},
 						convertToExpectedModel: function (model) {
@@ -55,6 +59,25 @@
 						},
 						chapterListLoaded_: function() {
 								this.fire("chapter-list-loaded", chapterList_);
+						},
+						driveModelReadyChanged: function (oldvalue, newvalue) {
+								this.updateStarred();
+						},
+						updateStarred: function() {
+								if (!this.mangaId || !this.driveModelReady) {
+										return;
+								}
+
+								this.starred = this.$.driveData.isMangaStarred(this.mangaId);
+						},
+						toggleStarred: function() {
+								if (!this.mangaId || !this.driveModelReady) {
+										return;
+								}
+
+								this.updateStarred();
+								this.starred = !this.starred;
+								this.$.driveData.setMangaStarred(this.mangaId, this.starred);
 						},
 				});
 		})();
