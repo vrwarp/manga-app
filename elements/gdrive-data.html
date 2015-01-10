@@ -194,20 +194,25 @@
 								return starredList_.indexOf(chapterId) != -1;
 						},
 						setMangaStarred: function (chapterId, starred) {
-								if (starred) {
-										starredList_.push(chapterId);
-								} else {
-										model_.beginCompoundOperation("Remove " + chapterId);
-
-										var starredArray = starredList_.asArray()
-										starredList_.clear();
-										starredList_.pushAll(starredArray.filter(function (value) {
-												return value != chapterId;
-										}));
-
-										model_.endCompoundOperation();
+								if (!initialized_) {
+										return false;
 								}
-								return;
+
+								if (!starred) {
+										model_.beginCompoundOperation("Remove " + chapterId);
+										while (starredList_.removeValue(chapterId)) {}
+										model_.endCompoundOperation();
+								} else if (starredList_.indexOf(chapterId) == -1) {
+										starredList_.push(chapterId);
+								}
+								return true;
+						},
+						getStarredManga: function() {
+								if (!initialized_) {
+										return new Set();
+								}
+
+								return new Set(starredList_.asArray());
 						},
 				});
 		})();

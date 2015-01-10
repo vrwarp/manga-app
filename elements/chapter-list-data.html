@@ -30,7 +30,7 @@
 								if (mangaId_ == this.mangaId && initialized_) {
 										this.chapterListLoaded_();
 								}
-								this.updateStarred();
+								this.updateStarred_();
 						},
 						mangaIdChanged: function(oldValue, newValue) {
 								if (!this.mangaId) {
@@ -40,7 +40,7 @@
 								if (mangaId_ != this.mangaId) {
 										this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + this.mangaId + "/";
 										this.$.ajax.go();
-										this.updateStarred();
+										this.updateStarred_();
 								}
 						},
 						convertToExpectedModel: function (model) {
@@ -61,9 +61,9 @@
 								this.fire("chapter-list-loaded", chapterList_);
 						},
 						driveModelReadyChanged: function (oldvalue, newvalue) {
-								this.updateStarred();
+								this.updateStarred_();
 						},
-						updateStarred: function() {
+						updateStarred_: function() {
 								if (!this.mangaId || !this.driveModelReady) {
 										return;
 								}
@@ -75,7 +75,7 @@
 										return;
 								}
 
-								this.updateStarred();
+								this.updateStarred_();
 								this.starred = !this.starred;
 								this.$.driveData.setMangaStarred(this.mangaId, this.starred);
 						},

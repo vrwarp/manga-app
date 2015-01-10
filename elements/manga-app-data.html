@@ -2,10 +2,12 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
 <link rel="import" href="gdrive-data.html">
-<script type="application/javascript" src="../lib/task.js"></script>
 
 <polymer-element name="manga-app-data" attribute="loading">
   <template>
+		<gdrive-data
+			 id="driveData"
+			 modelReady="{{driveModelReady}}"></gdrive-data>
 		<core-ajax id="ajax" handleAs="json"></core-ajax>
 		<!-- Consider switching to polymer-localforage -->
 		<!--
@@ -137,6 +139,7 @@
 
 				Polymer({
 						loading: !initialized_,
+						starredManga_: new Set(),
 						domReady: function() {
 								addInstance_(this);
 								if (initialized_) {
@@ -147,21 +150,36 @@
 								this.fire("manga-list-loaded", this.getMangaList());
 						},
 						ascendingTitle: function (a,b) {
+								if (this.starredManga_.has(a.id) && !this.starredManga_.has(b.id)) {
+										return -1;
+								}
+								if (!this.starredManga_.has(a.id) && this.starredManga_.has(b.id)) {
+										return 1;
+								}
+
 								if (a.title < b.title) {
 										return -1;
-								} else if (a.title > b.title) {
-										return 1;
-								} else {
-										return 0;
 								}
+								if (a.title > b.title) {
+										return 1;
+								}
+
+								return 0;
 						},
 						getMangaList: function() {
 								var result = [];
 								for (var key in manga_) {
 										result.push(manga_[key]);
 								}
-								result.sort(this.ascendingTitle);
+								result.sort(this.ascendingTitle.bind(this));
 								return result;
+						},
+						driveModelReadyChanged: function (oldvalue, newvalue) {
+								this.updateStarred_();
+						},
+						updateStarred_: function() {
+								this.starredManga_ = this.$.driveData.getStarredManga();
+								this.mangaListLoaded_();
 						},
 				});
 		})();
