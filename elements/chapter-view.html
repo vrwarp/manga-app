@@ -178,7 +178,7 @@
 						this.addNextChapterButton_();
 				},
 				addNextChapterButton_: function() {
-						if (!this.nextChapterId) {
+						if (!this.nextChapterId || this.$.list.data.length == 0) {
 								return;
 						}
 						this.$.list.data.push({
