@@ -161,14 +161,6 @@
 								var filter = new RegExp(filterString, "i");
 								return filter.test(manga.title);
 						},
-						convertToExpectedModel: function (model) {
-								return {
-										title: model.t,
-										id: model.i,
-										image: model.im ? "https://cdn.mangaeden.com/mangasimg/" + model.im : undefined,
-										latestChapterDate: model.ld
-								};
-						},
 						searchFilterChanged: function (oldValue, newValue) {
 								if (!this.$.list || !this.$.list.data) {
 										return;
