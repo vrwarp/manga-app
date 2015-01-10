@@ -42,6 +42,7 @@
 								if (mangaId_ != this.mangaId) {
 										this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + this.mangaId + "/";
 										this.$.ajax.go();
+								} else {
 										this.updateStarred_();
 								}
 						},
@@ -66,11 +67,11 @@
 								this.updateStarred_();
 						},
 						updateStarred_: function() {
-								if (!this.mangaId || !this.driveModelReady) {
+								if (!mangaId_ || !this.driveModelReady) {
 										return;
 								}
 
-								this.starred = this.$.driveData.isMangaStarred(this.mangaId);
+								this.starred = this.$.driveData.isMangaStarred(mangaId_);
 						},
 						toggleStarred: function() {
 								if (!this.mangaId || !this.driveModelReady) {
