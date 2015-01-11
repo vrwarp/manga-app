@@ -3,7 +3,7 @@
 <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
 <link rel="import" href="gdrive-data.html">
 
-<polymer-element name="chapter-list-data" attributes="mangaId starred">
+<polymer-element name="chapter-list-data" attributes="mangaId starred latestReadDate">
   <template>
 		<gdrive-data
 			 id="driveData"
@@ -26,8 +26,10 @@
 
 				Polymer({
 						loading: !initialized_,
+						latestReadDate: (new Date()).getTime() / 1000.0,
 						ready: function() {
 								this.updateStarred_();
+								this.updateLatestReadDate_();
 						},
 						domReady: function() {
 								if (mangaId_ == this.mangaId && initialized_) {
@@ -40,10 +42,12 @@
 								}
 
 								if (mangaId_ != this.mangaId) {
+										mangaId_ = null;
 										this.$.ajax.url = "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/manga/" + this.mangaId + "/";
 										this.$.ajax.go();
 								} else {
 										this.updateStarred_();
+										this.updateLatestReadDate_();
 								}
 						},
 						convertToExpectedModel: function (model) {
@@ -58,6 +62,8 @@
 								mangaId_ = this.mangaId;
 								chapterList_ = detail.response.chapters.map(this.convertToExpectedModel);
 								initialized_ = true;
+								this.updateStarred_();
+								this.updateLatestReadDate_();
 								this.chapterListLoaded_();
 						},
 						chapterListLoaded_: function() {
@@ -65,6 +71,13 @@
 						},
 						driveModelReadyChanged: function (oldvalue, newvalue) {
 								this.updateStarred_();
+								this.updateLatestReadDate_();
+						},
+						updateLatestReadDate_: function () {
+								if (!mangaId_ || !this.driveModelReady) {
+										return;
+								}
+								this.latestReadDate = this.$.driveData.getLatestReadChapterDate(mangaId_);
 						},
 						updateStarred_: function() {
 								if (!mangaId_ || !this.driveModelReady) {

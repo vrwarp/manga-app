@@ -8,6 +8,7 @@
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="resize-listener.html">
 <link rel="import" href="chapter-list-data.html">
+<link rel="import" href="gdrive-data.html">
 
 <polymer-element name="chapter-view" attributes="mangaId mangaTitle chapterId chapterNumber chapterTitle">
   <template>
@@ -19,11 +20,11 @@
 					height: 100%;
 			}
 
-			.page .nextChapter div {
+			.page #nextChapter div {
 					margin: 8px 8px;
 			}
 
-			.page .nextChapter paper-button {
+			.page #nextChapter paper-button {
 					margin: 0 auto;
 					width: {{medianImageWidth}}px;
 					max-width: 100%;
@@ -46,6 +47,10 @@
 			}
 		</style>
 		
+		<gdrive-data
+			 id="driveData"
+			 modelReady="{{driveModelReady}}"></gdrive-data>
+
 		<chapter-list-data
 			 id="chapterListData"
 			 mangaId="{{mangaId}}"
@@ -176,6 +181,7 @@
 				nextChapterId: null,
 				nextChapterNumber: null,
 				nextChapterTitle: null,
+				chapter: null,
 				chapterListLoaded: function (event, detail, sender) {
 						var index = 0;
 						for (index = 0; index < detail.length; index++) {
@@ -183,12 +189,34 @@
 										break;
 								}
 						}
+
+						// Not found?!
+						if (index == detail.length) {
+								console.warn("Could not find current chapter in chapter list.");
+								return;
+						}
+
+						this.chapter = detail[index];
+						if (this.driveModelReady) {
+								this.setLatestReadChapterDate_();
+						}
+
+						// Setup next button.
 						if (index > 0) {
 								this.nextChapterId = detail[index-1].id;
 								this.nextChapterNumber = detail[index-1].number;
 								this.nextChapterTitle = detail[index-1].title;
 						}
 						this.addNextChapterButton_();
+				},
+				driveModelReadyChanged: function (oldvalue, newvalue) {
+						if (!newvalue || !this.chapter) {
+								return;
+						}
+						this.setLatestReadChapterDate_();
+				},
+				setLatestReadChapterDate_: function() {
+						this.$.driveData.setLatestReadChapterDate(this.mangaId, this.chapter.date);
 				},
 				addNextChapterButton_: function() {
 						if (!this.nextChapterId || this.$.list.data.length == 0) {

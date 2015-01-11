@@ -185,24 +185,24 @@
 								this.profileImage = profileImage_;
 								this.loggedIn = authenticated_;
 						},
-						isMangaStarred: function (chapterId) {
+						isMangaStarred: function (mangaId) {
 								if (!initialized_) {
 										return false;
 								}
 
-								return starredList_.indexOf(chapterId) != -1;
+								return starredList_.indexOf(mangaId) != -1;
 						},
-						setMangaStarred: function (chapterId, starred) {
+						setMangaStarred: function (mangaId, starred) {
 								if (!initialized_) {
 										return false;
 								}
 
 								if (!starred) {
-										model_.beginCompoundOperation("Remove " + chapterId);
-										while (starredList_.removeValue(chapterId)) {}
+										model_.beginCompoundOperation("Remove " + mangaId);
+										while (starredList_.removeValue(mangaId)) {}
 										model_.endCompoundOperation();
-								} else if (starredList_.indexOf(chapterId) == -1) {
-										starredList_.push(chapterId);
+								} else if (starredList_.indexOf(mangaId) == -1) {
+										starredList_.push(mangaId);
 								}
 								return true;
 						},
@@ -212,6 +212,24 @@
 								}
 
 								return new Set(starredList_.asArray());
+						},
+						setLatestReadChapterDate: function (mangaId, chapterDate) {
+								if (!initialized_ || this.getLatestReadChapterDate(mangaId) > chapterDate) {
+										return;
+								}
+								readMap_.set(mangaId, chapterDate);
+						},
+						getLatestReadChapterDate: function (mangaId) {
+								if (!initialized_ || !readMap_.has(mangaId)) {
+										return 0;
+								}
+								return readMap_.get(mangaId);
+						},
+						getLatestReadChapterDateMap: function() {
+								if (!initialized_) {
+										return new Map();
+								}
+								return new Map(readMap_.items());
 						},
 						authenticate: function() {
 								// Authenticate with a pop-up.

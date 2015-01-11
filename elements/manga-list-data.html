@@ -19,7 +19,9 @@
 		(function() {
 				var initialized_ = false;
 				var manga_ = {};
-				
+				var starredManga_ = new Set();
+				var latestReadDateMap_ = new Map();
+
 				var nextInstanceId_ = 0;
 				var instanceKeys_ = [];
 				var instanceMap_ = new WeakMap();
@@ -98,7 +100,10 @@
 								title: convertHTMLEntitiesToString_(model.t),
 								id: model.i,
 								image: model.im ? "https://cdn.mangaeden.com/mangasimg/" + model.im : undefined,
-								latestChapterDate: model.ld
+								latestChapterDate: model.ld,
+								starred: starredManga_.has(model.i),
+								hasUnreadChapters: latestReadDateMap_.has(model.i) &&
+										model.ld > latestReadDateMap_.get(model.i),
 						};
 				}
 
@@ -145,7 +150,6 @@
 
 				Polymer({
 						loading: !initialized_,
-						starredManga_: new Set(),
 						domReady: function() {
 								addInstance_(this);
 								if (initialized_) {
@@ -156,10 +160,17 @@
 								this.fire("manga-list-loaded", this.getMangaList());
 						},
 						ascendingTitle: function (a,b) {
-								if (this.starredManga_.has(a.id) && !this.starredManga_.has(b.id)) {
+								if (a.starred && !b.starred) {
 										return -1;
 								}
-								if (!this.starredManga_.has(a.id) && this.starredManga_.has(b.id)) {
+								if (!a.starred && b.starred) {
+										return 1;
+								}
+
+								if (a.hasUnreadChapters && !b.hasUnreadChapters) {
+										return -1;
+								}
+								if (!a.hasUnreadChapters && b.hasUnreadChapters) {
 										return 1;
 								}
 
@@ -182,10 +193,21 @@
 						},
 						driveModelReadyChanged: function (oldvalue, newvalue) {
 								this.updateStarred_();
+								this.updateLatestReadDateMap_();
+								this.mangaListLoaded_();
 						},
 						updateStarred_: function() {
-								this.starredManga_ = this.$.driveData.getStarredManga();
-								this.mangaListLoaded_();
+								starredManga_ = this.$.driveData.getStarredManga();
+								for (var key in manga_) {
+										manga_[key].starred = starredManga_.has(key);
+								}
+						},
+						updateLatestReadDateMap_: function() {
+								latestReadDateMap_ = this.$.driveData.getLatestReadChapterDateMap();
+								for (var key in manga_) {
+										manga_[key].hasUnreadChapters = latestReadDateMap_.has(key) &&
+												manga_[key].latestChapterDate > latestReadDateMap_.get(key);
+								}
 						},
 				});
 		})();

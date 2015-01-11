@@ -1,6 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-list/core-list.html">
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/core-icons/av-icons.html">
 <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
@@ -50,6 +52,7 @@
 			 id="chapterListData"
 			 mangaId="{{mangaId}}"
 			 starred="{{starred}}"
+			 latestReadDate="{{latestReadDate}}"
 			 on-chapter-list-loaded="{{chapterListLoaded}}"></chapter-list-data>
 
 		<core-header-panel mode="seamed" fit>
@@ -73,8 +76,16 @@
 				<template>
 					<div class="card">
 						<paper-shadow z="1" vertical layout>
-							<div class="title">{{model.title}}</div>
-							<div class="chapterNumber">Chapter {{model.number}}</div>
+							<div horizontal layout>
+								<div vertical layout>
+									<div class="title">{{model.title}}</div>
+									<div class="chapterNumber">Chapter {{model.number}}</div>
+								</div>
+								<div flex></div>
+								<template if="{{model.date > latestReadDate}}">
+									<core-icon icon="av:new-releases"></core-icon>
+								</template>
+							</div>
 							<div flex></div>
 							<div class="date">{{dateFromEpoch(model.date)}}</div>
 						</paper-shadow>
