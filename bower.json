@@ -30,6 +30,7 @@
     "core-localstorage": "Polymer/core-localstorage#~0.5.2",
     "paper-shadow": "Polymer/paper-shadow#~0.5.2",
     "localforage": "~1.2.0",
-    "paper-button": "Polymer/paper-button#~0.5.2"
+    "paper-button": "Polymer/paper-button#~0.5.2",
+    "paper-spinner": "Polymer/paper-spinner#~0.5.2"
   }
 }
