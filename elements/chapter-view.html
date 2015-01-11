@@ -10,7 +10,7 @@
 <link rel="import" href="chapter-list-data.html">
 <link rel="import" href="gdrive-data.html">
 
-<polymer-element name="chapter-view" attributes="mangaId chapterId">
+<polymer-element name="chapter-view" attributes="mangaId chapterId fullscreen">
   <template>
 		<style>
 			.page core-image {
@@ -41,9 +41,26 @@
 					background-color: #4CAF50;
 					color: #FFF;
 			}
-			
+
 			core-list {
 					background-color: #EEE;
+			}
+
+			core-toolbar.fullscreenMode {
+					display: none;
+			}
+
+			#fullscreenControls {
+					display: none;
+			}
+
+			#fullscreenControls.fullscreenMode {
+					display: flex;
+					width: 56px;
+					height: 56px;
+					margin-right: 0;
+					margin-top: 0;
+					margin-left: auto;
 			}
 		</style>
 		
@@ -62,9 +79,11 @@
 			 on-core-response="{{handleResponse}}"></core-ajax>
 
 		<core-header-panel fit>
-			<core-toolbar>
+			<core-toolbar class="core-narrow {{ {fullscreenMode: fullscreen} | tokenList}}">
         <paper-icon-button icon="arrow-back" on-click="{{backClicked}}"></paper-icon-button>
 				<div>Chapter {{chapter.number}}: {{chapter.title}}</div>
+				<div flex></div>
+				<paper-icon-button icon="fullscreen" on-click="{{toggleFullscreen}}"></paper-icon-button>
 			</core-toolbar>
 
 			<core-list
@@ -98,11 +117,16 @@
 					</div>
 				</template>
 			</core-list>
+
+			<div id="fullscreenControls" horizontal center-justified layout center
+					 class="{{ {fullscreenMode: fullscreen} | tokenList}}">
+				<paper-icon-button icon="fullscreen-exit" on-click="{{toggleFullscreen}}"></paper-icon-button>
+			</div>
 		</core-header-panel>
   </template>
 	<script>
 		Polymer({
-				//  width="{{model[2]}}" height="{{model[3]}}"
+				fullscreen: false,
 				ready: function() {
 						if (this.chapterId) {
 								this.chapterIdChanged("", this.chapterId);
@@ -232,6 +256,9 @@
 				nextChapter: function() {
 						document.querySelector("app-router").go(
 								"/manga/" + [this.mangaId, this.nextChapterId].map(escape).join("/"));
+				},
+				toggleFullscreen: function() {
+						this.fullscreen = !this.fullscreen;
 				},
 		});
 	</script>
