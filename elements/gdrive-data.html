@@ -53,6 +53,24 @@
 						'https://www.googleapis.com/auth/plus.me',
 				];
 
+				var reauthenticate_ = function() {
+						gapi.auth.authorize(
+								{
+										client_id: CLIENT_ID,
+										scope: SCOPES,
+										immediate: true
+								},
+								handleReauthentication_);
+				}
+
+				var handleReauthentication_ = function() {
+						if (authResult && !authResult.error) {
+								return;
+						}
+						authenticated_ = false;
+						checkAuth_();
+				}
+
 				var checkAuth_ = function() {
 						if (authenticated_) {
 								return;
@@ -115,7 +133,7 @@
 				
 				var modelLoadingFailed_ = function(e) {
 						if(e.type == gapi.drive.realtime.ErrorType.TOKEN_REFRESH_REQUIRED) {
-								checkAuth_();
+								reauthenticate_();
 						} else if(e.type == gapi.drive.realtime.ErrorType.CLIENT_ERROR) {
 								console.error("ERROR: Error loading model: " + e.message);
 						} else if(e.type == gapi.drive.realtime.ErrorType.NOT_FOUND) {
@@ -124,27 +142,7 @@
 				};
 
 				var loadModel_ = function() {
-						return gapi.client.drive.files.list({
-								"q": "'appfolder' in parents and title='config'"
-						}).then(function(resp) {
-								if (resp.result.items.length == 0) {
-										console.log("INFO: creating initial config");
-										return gapi.client.drive.files.insert({
-												'resource': {
-														mimeType: "application/com.vrwarp.manga-app.config",
-														title: "config",
-														parents: [{'id': 'appfolder'}],
-												}
-										}).then(function (resp) {
-												return resp.result;
-										});
-								} else if (resp.result.items.length > 1) {
-										console.log("WARNING: more than one config found");
-								}
-								return resp.result.items[0];
-						}).then(function(file) {
-								gapi.drive.realtime.load(file.id, modelLoaded_, initializeModel_, modelLoadingFailed_);
-						});
+						gapi.drive.realtime.loadAppDataDocument(modelLoaded_, initializeModel_, modelLoadingFailed_);
 				}
 
 				var domReady_ = false;
