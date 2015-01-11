@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-list/core-list.html">
 <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../bower_components/core-image/core-image.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="resize-listener.html">
@@ -10,7 +11,7 @@
 <polymer-element name="chapter-view" attributes="mangaId mangaTitle chapterId chapterNumber chapterTitle">
   <template>
 		<style>
-			.page img {
+			.page core-image {
 					margin: 0 auto;
 					display: block;
 			}
@@ -66,9 +67,10 @@
 				<template>
 					<div class="page" >
 						<template if="{{model.image}}">
-							<img src="{{model.image.url}}"
-									 width="{{listWidth > model.image.width ? model.image.width : listWidth}}"
-									 height="{{model.image.height * ((listWidth > model.image.width ? model.image.width : listWidth) / model.image.width)}}">
+							<core-image src="{{model.image.url}}"
+													sizing="contain"
+													style="width:{{listWidth > model.image.width ? model.image.width : listWidth}}px;
+																 height:{{model.image.height * ((listWidth > model.image.width ? model.image.width : listWidth) / model.image.width)}}px">
 						</template>
 						<template if="{{model.nextChapterButton}}">
 							<div>
