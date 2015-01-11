@@ -10,7 +10,7 @@
 <link rel="import" href="chapter-list-data.html">
 <link rel="import" href="gdrive-data.html">
 
-<polymer-element name="chapter-view" attributes="mangaId mangaTitle chapterId chapterNumber chapterTitle">
+<polymer-element name="chapter-view" attributes="mangaId chapterId">
   <template>
 		<style>
 			.page core-image {
@@ -64,7 +64,7 @@
 		<core-header-panel fit>
 			<core-toolbar>
         <paper-icon-button icon="arrow-back" on-click="{{backClicked}}"></paper-icon-button>
-				<div>Chapter {{chapterNumber}}: {{chapterTitle}}</div>
+				<div>Chapter {{chapter.number}}: {{chapter.title}}</div>
 			</core-toolbar>
 
 			<core-list
@@ -171,8 +171,7 @@
 				},
 				backClicked: function () {
 						this.$.list.data = [];
-						document.querySelector("app-router").go(
-								"/" + escape(this.mangaId) + "/" + escape(this.mangaTitle));
+						document.querySelector("app-router").go("/manga/" + escape(this.mangaId));
 						this.fire("back", {});
 				},
 				dateFromEpoch: function (seconds) {
@@ -181,7 +180,11 @@
 				nextChapterId: null,
 				nextChapterNumber: null,
 				nextChapterTitle: null,
-				chapter: null,
+				chapter: {
+						title: "Loading...",
+						number: "-",
+						date: 0,
+				},
 				chapterListLoaded: function (event, detail, sender) {
 						var index = 0;
 						for (index = 0; index < detail.length; index++) {
@@ -210,7 +213,7 @@
 						this.addNextChapterButton_();
 				},
 				driveModelReadyChanged: function (oldvalue, newvalue) {
-						if (!newvalue || !this.chapter) {
+						if (!newvalue || !this.chapter.id) {
 								return;
 						}
 						this.setLatestReadChapterDate_();
@@ -228,7 +231,7 @@
 				},
 				nextChapter: function() {
 						document.querySelector("app-router").go(
-								"/" + [this.mangaId, this.mangaTitle, this.nextChapterId, this.nextChapterNumber, this.nextChapterTitle].map(escape).join("/"));
+								"/manga/" + [this.mangaId, this.nextChapterId].map(escape).join("/"));
 				},
 		});
 	</script>

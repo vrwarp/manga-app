@@ -6,9 +6,10 @@
 <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
+<link rel="import" href="manga-list-data.html">
 <link rel="import" href="chapter-list-data.html">
 
-<polymer-element name="chapter-list" attributes="mangaId mangaTitle">
+<polymer-element name="chapter-list" attributes="mangaId">
   <template>
 		<style>
 			.card {
@@ -48,6 +49,9 @@
 			}
 		</style>
 		
+		<manga-list-data
+			 on-manga-list-loaded="{{mangaListLoaded}}"></manga-list-data>
+
 		<chapter-list-data
 			 id="chapterListData"
 			 mangaId="{{mangaId}}"
@@ -58,7 +62,7 @@
 		<core-header-panel mode="seamed" fit>
 			<core-toolbar>
 				<paper-icon-button icon="arrow-back" on-click="{{backClicked}}"></paper-icon-button>
-				<div>{{mangaTitle}}</div>
+				<div>{{manga.title}}</div>
 				<div flex></div>
 				<paper-icon-button
 					 icon="{{starred?'star':'star-outline'}}"
@@ -100,7 +104,7 @@
 						selectChapter: function (event, detail, sender) {
 								console.log(detail);
 								document.querySelector("app-router").go(
-										"/" + [this.mangaId, this.mangaTitle, detail.data.id, detail.data.number, detail.data.title].map(escape).join("/"));
+										"/manga/" + [this.mangaId, detail.data.id].map(escape).join("/"));
 						},
 						backClicked: function () {
 								document.querySelector("app-router").go("/");
@@ -113,6 +117,16 @@
 						},
 						toggleStarred: function() {
 								this.$.chapterListData.toggleStarred();
+						},
+						manga: {
+								title: "Loading...",
+						},
+						mangaListLoaded: function (event, detail, sender) {
+								for (var i = 0; i < detail.length; i++) {
+										if (detail[i].id == this.mangaId) {
+												this.manga = detail[i];
+										}
+								}
 						},
 				});
 		})();
