@@ -133,7 +133,6 @@
 								this.$.list.data = mangaList_;
 						},
 						selectManga: function (event, detail, sender) {
-								console.log(detail.data);
 								document.querySelector("app-router").go("/manga/" + escape(detail.data.id));
 						},
 						activateSearch: function (event, detail, sender) {
