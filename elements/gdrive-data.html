@@ -63,7 +63,7 @@
 								handleReauthentication_);
 				}
 
-				var handleReauthentication_ = function() {
+				var handleReauthentication_ = function(authResult) {
 						if (authResult && !authResult.error) {
 								return;
 						}
