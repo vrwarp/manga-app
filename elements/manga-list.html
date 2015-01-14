@@ -141,9 +141,9 @@
 								this.$.toolbarPages.selected = 1;
 								
 								var searchInput = this.$.searchInput;
-								window.setTimeout(function() {
+								window.requestAnimationFrame(function() {
 										searchInput.$.decorator.input.focus();
-								}, 0);
+								});
 						},
 						deactivateSearch: function (event, detail, sender) {
 								this.$.searchInput.value = "";
