@@ -46,15 +46,16 @@
 								context: this.context,
 								enabled: false,
 								continuous: false,
-								handler: function(direction) {
-										console.log("Page " + this.page +" waypoint is triggered! Direction: " + direction);
-								}.bind(this),
+								handler: this.crossWaypoint.bind(this),
 						});
 						this.waypoint.enable();
 				},
 				detachedCallback: function() {
 						console.log("Detatched");
 						this.waypoint.destroy();
+				},
+				crossWaypoint: function(direction) {
+						this.fire("page-crossed", {direction: direction, page: this.page});
 				},
 				pageChanged: function() {
 						if (this.waypoint) {
@@ -67,7 +68,7 @@
 	</script>
 </ploymer-element>
 
-<polymer-element name="chapter-view" attributes="mangaId chapterId fullscreen">
+<polymer-element name="chapter-view" attributes="mangaId chapterId page fullscreen">
   <template>
 		<style>
 			.page #nextChapter div {
@@ -155,7 +156,8 @@
 				<template>
 					<div class="page" >
 						<template if="{{model.image}}">
-							<chapter-page imageUrl="{{model.image.url}}" page="{{model.image.page}}" context="{{$.list}}"
+							<chapter-page imageUrl="{{model.image.url}}" page="{{index}}" context="{{$.list}}"
+														on-page-crossed="{{handlePageCrossed}}"
 														style="width:{{listWidth > model.image.width ? model.image.width : listWidth}}px;
 																	 height:{{model.image.height * ((listWidth > model.image.width ? model.image.width : listWidth) / model.image.width)}}px;
 																	 margin: 0 auto;"></chapter-page>
@@ -179,6 +181,7 @@
   </template>
 	<script>
 		Polymer({
+				page: 0,
 				fullscreen: false,
 				ready: function() {
 						if (this.chapterId) {
@@ -288,6 +291,9 @@
 								this.nextChapterTitle = detail[index-1].title;
 						}
 						this.addNextChapterButton_();
+
+						// Scroll to page.
+						window.setTimeout(this.$.list.scrollToItem.bind(this.$.list, this.page), 0);
 				},
 				driveModelReadyChanged: function (oldvalue, newvalue) {
 						if (!newvalue || !this.chapter.id) {
@@ -313,6 +319,18 @@
 				},
 				toggleFullscreen: function() {
 						this.fullscreen = !this.fullscreen;
+				},
+				handlePageCrossed: function (event, detail, sender) {
+						console.log("Page " + detail.page +" crossed! Direction: " + detail.direction);
+
+						if (detail.direction == "down") {
+								this.page = detail.page + 1;
+						} else {
+								this.page = detail.page;
+						}
+						window.history.replaceState(
+								null, null, "#/manga/" +
+										[this.mangaId, this.chapterId, this.page].map(escape).join("/"));
 				},
 		});
 	</script>
