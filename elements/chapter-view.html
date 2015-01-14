@@ -61,7 +61,7 @@
 						if (this.waypoint) {
 								this.waypoint.disable();
 								this.waypoint.context.refresh();
-								window.setTimeout(this.waypoint.enable.bind(this.waypoint), 0);
+								window.requestAnimationFrame(this.waypoint.enable.bind(this.waypoint));
 						}
 				},
 		});
@@ -293,7 +293,7 @@
 						this.addNextChapterButton_();
 
 						// Scroll to page.
-						window.setTimeout(this.$.list.scrollToItem.bind(this.$.list, this.page), 0);
+						window.requestAnimationFrame(this.$.list.scrollToItem.bind(this.$.list, this.page));
 				},
 				driveModelReadyChanged: function (oldvalue, newvalue) {
 						if (!newvalue || !this.chapter.id) {
