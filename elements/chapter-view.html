@@ -44,10 +44,12 @@
 						this.waypoint = new Waypoint({
 								element: this.$.image,
 								context: this.context,
+								enabled: false,
 								handler: function(direction) {
 										console.log("Page " + this.page +" waypoint is triggered! Direction: " + direction);
 								}.bind(this),
 						});
+						this.waypoint.enable();
 				},
 				detachedCallback: function() {
 						console.log("Detatched");
