@@ -45,6 +45,7 @@
 								element: this.$.image,
 								context: this.context,
 								enabled: false,
+								continuous: false,
 								handler: function(direction) {
 										console.log("Page " + this.page +" waypoint is triggered! Direction: " + direction);
 								}.bind(this),
@@ -57,7 +58,9 @@
 				},
 				pageChanged: function() {
 						if (this.waypoint) {
+								this.waypoint.disable();
 								this.waypoint.context.refresh();
+								window.setTimeout(this.waypoint.enable.bind(this.waypoint), 0);
 						}
 				},
 		});
