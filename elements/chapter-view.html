@@ -86,7 +86,14 @@
 		<core-header-panel fit>
 			<core-toolbar class="core-narrow {{ {fullscreenMode: fullscreen} | tokenList}}">
         <paper-icon-button icon="arrow-back" on-click="{{backClicked}}"></paper-icon-button>
-				<div>Chapter {{chapter.number}}: {{chapter.title}}</div>
+				<div title="Chapter {{chapter.number}}: {{chapter.title}}" style="overflow: hidden; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+					<template if="{{listWidth < 640}}">
+						{{chapter.title}}
+					</template>
+					<template if="{{listWidth >= 640}}">
+						Chapter {{chapter.number}}: {{chapter.title}}
+					</template>
+				</div>
 				<div flex></div>
 				<paper-icon-button icon="fullscreen" on-click="{{toggleFullscreen}}"></paper-icon-button>
 			</core-toolbar>
