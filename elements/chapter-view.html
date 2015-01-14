@@ -10,17 +10,61 @@
 <link rel="import" href="resize-listener.html">
 <link rel="import" href="chapter-list-data.html">
 <link rel="import" href="gdrive-data.html">
+<script type="text/javascript" src="../bower_components/waypoints/lib/noframework.waypoints.js"></script>
 
-<polymer-element name="chapter-view" attributes="mangaId chapterId fullscreen">
+<polymer-element name="chapter-page" attributes="imageUrl page context">
   <template>
 		<style>
-			.page core-image {
+			:host {
+					display: block;
+			}
+
+			core-image {
 					display: block;
 					background-color: #FFF;
 					width: 100%;
 					height: 100%;
 			}
+		</style>
+		<core-image 
+			 id="image"
+			 src="{{imageUrl}}"
+			 sizing="contain"
+			 fade
+			 preload
+			 loading="{{imageLoading}}"></core-image>
+		<div fit horizontal center-justified layout center>
+			<paper-spinner active?="{{imageLoading}}"></paper-spinner>
+		</div>
+	</template>
+	<script>
+		Polymer({
+				attachedCallback: function() {
+						console.log("Attached");
+						this.waypoint = new Waypoint({
+								element: this.$.image,
+								context: this.context,
+								handler: function(direction) {
+										console.log("Page " + this.page +" waypoint is triggered! Direction: " + direction);
+								}.bind(this),
+						});
+				},
+				detachedCallback: function() {
+						console.log("Detatched");
+						this.waypoint.destroy();
+				},
+				pageChanged: function() {
+						if (this.waypoint) {
+								this.waypoint.context.refresh();
+						}
+				},
+		});
+	</script>
+</ploymer-element>
 
+<polymer-element name="chapter-view" attributes="mangaId chapterId fullscreen">
+  <template>
+		<style>
 			.page #nextChapter div {
 					margin: 8px 8px;
 			}
@@ -106,18 +150,10 @@
 				<template>
 					<div class="page" >
 						<template if="{{model.image}}">
-							<div style="width:{{listWidth > model.image.width ? model.image.width : listWidth}}px;
-													height:{{model.image.height * ((listWidth > model.image.width ? model.image.width : listWidth) / model.image.width)}}px;
-													margin: 0 auto;">
-								<core-image 
-									 src="{{model.image.url}}"
-									 sizing="contain"
-									 fade
-									 preload
-									 loading="{{imageLoading}}"></core-image>
-								<div fit horizontal center-justified layout center>
-									<paper-spinner active?="{{imageLoading}}"></paper-spinner>
-								</div>
+							<chapter-page imageUrl="{{model.image.url}}" page="{{model.image.page}}" context="{{$.list}}"
+														style="width:{{listWidth > model.image.width ? model.image.width : listWidth}}px;
+																	 height:{{model.image.height * ((listWidth > model.image.width ? model.image.width : listWidth) / model.image.width)}}px;
+																	 margin: 0 auto;"></chapter-page>
 						</template>
 						<template if="{{model.nextChapterButton}}">
 							<div id="nextChapter">
