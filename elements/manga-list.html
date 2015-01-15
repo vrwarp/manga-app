@@ -5,6 +5,7 @@
 <link rel="import" href="../bower_components/core-a11y-keys/core-a11y-keys.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/google-signin/google-icons.html">
 <link rel="import" href="gdrive-data.html">
 <link rel="import" href="manga-list-data.html">
@@ -63,6 +64,7 @@
        profileImage="{{profileImage}}"></gdrive-data>
     
     <manga-list-data
+       progress="{{mangaListProgress}}"
        on-manga-list-loaded="{{mangaListLoaded}}"></manga-list-data>
 
     <core-header-panel mode="seamed" fit>
@@ -105,6 +107,13 @@
              icon="google:google-plus"
              style="background-color: #dd4b39; border-radius: 20px;"
              on-click="{{authenticate}}"></paper-icon-button>
+        </template>
+
+        <template if="{{mangaListProgress <= 1}}">
+          <paper-progress
+             class="bottom fit"
+             value="{{mangaListProgress * 100}}"
+             indeterminate?="{{mangaListProgress < 0}}"></paper-progress>
         </template>
       </core-toolbar>
 

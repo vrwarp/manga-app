@@ -3,8 +3,9 @@
 <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
 <link rel="import" href="gdrive-data.html">
 <script type="text/javascript" src="../bower_components/localforage/dist/localforage.js"></script>
+<script type="text/javascript" src="utils.js"></script>
 
-<polymer-element name="manga-list-data" attribute="loading">
+<polymer-element name="manga-list-data" attributes="loading progress">
   <template>
     <gdrive-data
        id="driveData"
@@ -41,49 +42,13 @@
                 }
             }
         }
-
-        var getUrl_ = function (url) {
-            // Return a new promise.
-            return new Promise(function(resolve, reject) {
-                // Do the usual XHR stuff
-                var req = new XMLHttpRequest();
-                req.open('GET', url);
-                
-                req.onload = function() {
-                    // This is called even on 404 etc
-                    // so check the status
-                    if (req.status == 200) {
-                        // Resolve the promise with the response text
-                        resolve(req.response);
-                    }
-                    else {
-                        // Otherwise reject with the status text
-                        // which will hopefully be a meaningful error
-                        reject(Error(req.statusText));
-                    }
-                };
-                
-                // Handle network errors
-                req.onerror = function() {
-                    reject(Error("Network Error"));
-                };
-                
-                // Make the request
-                req.send();
-            });
-        }
-
-        var getJsonUrl_ = function (url) {
-            return getUrl_(url).then(function (response) {
-                try {
-                    return JSON.parse(response);
-                } catch (x) {
-                    console.warn('getJsonUrl_ caught an exception trying to parse response as JSON:');
-                    console.warn('url:', url);
-                    console.warn(x);
-                    return Promise.reject(x);
+        var updatePropertyOfInstances_ = function (property, value) {
+            for (var i = 0; i < instanceKeys_.length; i++) {
+                var key = instanceKeys_[i];
+                if (instanceMap_.has(key)) {
+                    instanceMap_.get(key)[property] = value;
                 }
-            });
+            }
         }
 
         var convertHTMLEntitiesToString_ = function (text) {
@@ -126,21 +91,44 @@
             });
 
             // Cache the updated value.
-            localforage.setItem("manga", manga_);
-            localforage.setItem("version", CACHE_VERSION);
+            localforage.setItem("manga/manga", manga_);
+            localforage.setItem("manga/version", CACHE_VERSION);
+        }
+
+        var cacheLength_ = -1;
+        localforage.getItem("manga/response-size").then(function(value) {
+            cacheLength_ = value;
+        });
+        var refreshMangaProgressEvent_ = function(event) {
+            var percent = -1;
+            if (event.lengthComputable) {
+                percent = event.loaded / event.total;
+            } else if (cacheLength_ > event.loaded) {
+                percent = event.loaded / cacheLength_;
+            }
+            updatePropertyOfInstances_("progress", percent);
+        }
+
+        var refreshMangaLoadEndEvent_ = function(event) {
+            updatePropertyOfInstances_("progress", 2);
+            localforage.setItem("manga/response-size", event.loaded);
         }
 
         var refreshManga_ = function() {
-            return getJsonUrl_("https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/list/0/").then(
-                function (data) {
+            return getJsonUrl(
+                "https://cors-anywhere.herokuapp.com/www.mangaeden.com/api/list/0/",
+                function (req) {
+                    req.addEventListener("progress", refreshMangaProgressEvent_, false);
+                    req.addEventListener("loadend", refreshMangaLoadEndEvent_, false);
+                }).then(function (data) {
                     updateManga_(data.manga.map(convertToExpectedMangaModel_));
                 });
         }
 
         var initialRefresh = refreshManga_();
         var fetchFromCache = Promise.all([
-            localforage.getItem("version"),
-            localforage.getItem("manga")]).then(function(values) {
+            localforage.getItem("manga/version"),
+            localforage.getItem("manga/manga")]).then(function(values) {
                 if (values[0] != CACHE_VERSION || !values[1]) {
                     return Promise.reject();
                 }
@@ -164,6 +152,7 @@
 
         Polymer({
             loading: !initialized_,
+            progress: 2,
             domReady: function() {
                 addInstance_(this);
                 if (initialized_) {
