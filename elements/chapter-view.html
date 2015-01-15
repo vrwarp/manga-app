@@ -152,7 +152,7 @@
 				 id="list"
 				 fit
 				 style="min-height:10px"
-				 height="{{medianImageHeight * ((listWidth > medianImageWidth ? medianImageWidth : listWidth) / medianImageWidth)}}">
+				 height="{{harmonicMeanHeight * ((listWidth > medianImageWidth ? medianImageWidth : listWidth) / medianImageWidth)}}">
 				<template>
 					<div class="page" >
 						<template if="{{model.image}}">
@@ -183,14 +183,14 @@
 		Polymer({
 				page: 0,
 				fullscreen: false,
+				medianImageWidth: 250,
+				medianImageHeight: 1000,
+				harmonicMeanHeight: 1000,
+				listWidth: 360,
 				ready: function() {
 						if (this.chapterId) {
 								this.chapterIdChanged("", this.chapterId);
 						}
-						
-						this.medianImageWidth = 256; // Some "reasonable" default.
-						this.medianImageHeight = 1024; // Some "reasonable" default.
-						this.listWidth = 360; // Some "reasonable" default.
 				},
 				domReady: function() {
 						this.listWidth = Math.max(360, this.$.list.clientWidth);
@@ -241,6 +241,10 @@
 						images.sort(this.ascendingImageHeight);
 						this.medianImageHeight = Math.max(1024, images[Math.floor(images.length/2)].image.height);
 						console.log("Median height updated to " + this.medianImageHeight);
+
+						this.harmonicMeanHeight = images.length / images.reduce(
+								function (prev, curr) { return 1.0/curr.image.height + prev; }, 0.0);
+						console.log("Harmonic mean height updated to " + this.harmonicMeanHeight);
 						
 						images.sort(this.ascendingImageData);
 						
