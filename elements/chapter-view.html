@@ -349,9 +349,13 @@
             clearInterval(this.endOfScrollCheck);
             this.endOfScrollCheck = null;
 
+            // Update URL to reflect read up to page.
             window.history.replaceState(
                 null, null, "#/manga/" +
                     [this.mangaId, this.chapterId, this.page].map(escape).join("/"));
+
+            // Update gdrive to refrect read up to page.
+            this.$.driveData.readPage(this.mangaId, this.chapterId, this.page);
         },
     });
   </script>
