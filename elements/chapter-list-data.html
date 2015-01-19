@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
 <link rel="import" href="gdrive-data.html">
+<script type="text/javascript" src="utils.js"></script>
 
 <polymer-element name="chapter-list-data" attributes="mangaId starred latestReadDate chaptersRead lastReadIndex">
   <template>
@@ -55,7 +56,7 @@
             convertToExpectedModel: function (model) {
                 return {
                     id: model[3],
-                    title: model[2] ? model[2] : "Chapter " + model[0],
+                    title: model[2] ? convertHTMLEntitiesToString(model[2]) : "Chapter " + model[0],
                     number: model[0],
                     date: model[1]
                 };
