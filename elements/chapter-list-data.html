@@ -53,7 +53,7 @@
             convertToExpectedModel: function (model) {
                 return {
                     id: model[3],
-                    title: model[2],
+                    title: model[2] ? model[2] : "Chapter " + model[0],
                     number: model[0],
                     date: model[1]
                 };
