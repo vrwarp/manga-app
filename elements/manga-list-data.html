@@ -241,12 +241,9 @@
                 return 0;
             },
             getMangaList: function() {
-                var result = [];
-                for (var key in manga_) {
-                    result.push(manga_[key]);
-                }
-                result.sort(this.ascendingTitle.bind(this));
-                return result;
+                var copy = mangaList_.slice();
+                copy.sort(this.ascendingTitle);
+                return copy;
             },
             driveModelReadyChanged: function (oldvalue, newvalue) {
                 this.updateStarred_();
