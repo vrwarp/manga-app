@@ -64,7 +64,7 @@
         }
 
         var updateManga_ = function (manga) {
-            manga.forEach(function (model) {
+            for (var model of manga) {
                 if (model.id in manga_) {
                     var original = manga_[model.id];
                     var updated = false;
@@ -83,7 +83,7 @@
                     mangaList_.push(model);
                     notifyInstances_("new-manga", model);
                 }
-            });
+            }
 
             // Cache the updated value.
             updateCache_();
